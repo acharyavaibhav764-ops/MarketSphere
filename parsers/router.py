@@ -6,6 +6,7 @@ from .base import BaseParser
 from .docling_parser import DoclingParser
 from .libreoffice_converter import LibreOfficeConverter
 from .text import TextParser
+from .pdf_stub import PdfStubParser
 
 
 class UnsupportedFileError(ValueError):
@@ -42,6 +43,8 @@ class ParserRouter:
         self.register(DoclingParser())
         # v3: register LibreOfficeConverter for .doc / .ppt
         self.register(LibreOfficeConverter())
+        # v4: register PdfStubParser for .pdf
+        self.register(PdfStubParser())
 
     # ------------------------------------------------------------------
     # Public API
