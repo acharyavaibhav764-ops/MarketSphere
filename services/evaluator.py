@@ -4,9 +4,10 @@ services/evaluator.py — Deterministic compliance evaluation engine.
 Evaluates a broker/product profile against approved regulatory rules.
 Completely deterministic:
   - No LLM in the hot path.
-  - Returns PASS, CONFLICT, or UNKNOWN.
-  - Missing facts NEVER default to PASS (they evaluate to UNKNOWN).
-  - Every result references the rule_id, rule_version, topic, and verbatim supporting_quote.
+  - Queries ONLY rules with review_status == "approved".
+  - Evaluates statutory capital floors, retail leverage caps, and local presence.
+  - Missing facts NEVER default to PASS (strictly evaluate to UNKNOWN).
+  - Returns PASS, CONFLICT, or UNKNOWN with specific rule citations.
 """
 import logging
 from typing import Any, Dict, List, Optional
@@ -14,8 +15,10 @@ from typing import Any, Dict, List, Optional
 logger = logging.getLogger(__name__)
 
 
-def _parse_ratio_denominator(ratio_str: str) -> Optional[int]:
-    """Parse leverage ratio e.g. '1:5' -> 5, '1:100' -> 100."""
+def parse_ratio_denominator(ratio_str: str) -> Optional[int]:
+    """Parse leverage ratio e.g. '1:5' -> 5, '1:30' -> 30."""
+    if not ratio_str or not isinstance(ratio_str, str):
+        return None
     try:
         parts = ratio_str.strip().split(":")
         if len(parts) == 2:
@@ -31,11 +34,12 @@ def evaluate_profile(profile: Dict[str, Any], db: Any) -> List[Dict[str, Any]]:
 
     Args:
         profile: Dictionary containing:
-            - jurisdiction: str (e.g. "UAE")
-            - product_type: Optional[str] (e.g. "leveraged_derivatives")
-            - leverage_offered: Optional[str] (e.g. "1:100")
-            - capital_available_usd: Optional[float] (e.g. 300000)
-        db: SQLAlchemy session or compatible object supporting query / all.
+            - jurisdiction: str (e.g. "United States", "United Kingdom", "UAE")
+            - product_type: Optional[str] (e.g. "leveraged_derivatives", "spot_trading")
+            - leverage_offered: Optional[str] (e.g. "1:100", "1:20")
+            - capital_available_usd: Optional[float] (e.g. 500000.0)
+            - has_local_presence: Optional[bool]
+        db: SQLAlchemy session, list of rule objects, or MockDB.
 
     Returns:
         List of evaluation result dicts:
@@ -52,7 +56,7 @@ def evaluate_profile(profile: Dict[str, Any], db: Any) -> List[Dict[str, Any]]:
     if not jurisdiction:
         return []
 
-    # Support SQLAlchemy Session query or mock DB
+    # Filter ONLY approved rules
     if hasattr(db, "query"):
         rules = (
             db.query(ComplianceRule)
@@ -77,8 +81,8 @@ def evaluate_profile(profile: Dict[str, Any], db: Any) -> List[Dict[str, Any]]:
         entry: Dict[str, Any] = {
             "rule_id": getattr(rule, "rule_id", "unknown"),
             "rule_version": getattr(rule, "rule_version", 1),
-            "topic": getattr(rule, "topic", None),
-            "supporting_quote": rd.get("supporting_quote") or getattr(rule, "supporting_quote", None),
+            "topic": getattr(rule, "topic", "general"),
+            "supporting_quote": rd.get("supporting_quote") or getattr(rule, "supporting_quote", ""),
         }
 
         # 1. Capital floor evaluation
@@ -86,8 +90,8 @@ def evaluate_profile(profile: Dict[str, Any], db: Any) -> List[Dict[str, Any]]:
         if req_cap is None and isinstance(rd, dict):
             req_cap = rd.get("required_capital_usd")
 
-        avail_cap = profile.get("capital_available_usd")
         if req_cap is not None:
+            avail_cap = profile.get("capital_available_usd")
             if avail_cap is None:
                 entry.update({
                     "status": "UNKNOWN",
@@ -98,7 +102,10 @@ def evaluate_profile(profile: Dict[str, Any], db: Any) -> List[Dict[str, Any]]:
             if avail_cap < req_cap:
                 entry.update({
                     "status": "CONFLICT",
-                    "reason": f"Available capital USD {avail_cap:,.2f} is below statutory requirement of USD {req_cap:,.2f}",
+                    "reason": (
+                        f"Available capital USD {avail_cap:,.2f} is below "
+                        f"statutory requirement of USD {req_cap:,.2f}"
+                    ),
                 })
                 results.append(entry)
                 continue
@@ -108,10 +115,19 @@ def evaluate_profile(profile: Dict[str, Any], db: Any) -> List[Dict[str, Any]]:
         if not cap_str and isinstance(rd, dict):
             cap_str = rd.get("leverage_cap_retail")
 
-        offered_str = profile.get("leverage_offered")
-        if cap_str and offered_str:
-            cap_ratio = _parse_ratio_denominator(cap_str)
-            offered_ratio = _parse_ratio_denominator(offered_str)
+        if cap_str:
+            offered_str = profile.get("leverage_offered")
+            if not offered_str:
+                entry.update({
+                    "status": "UNKNOWN",
+                    "reason": "leverage_offered not provided in product profile",
+                })
+                results.append(entry)
+                continue
+
+            cap_ratio = parse_ratio_denominator(cap_str)
+            offered_ratio = parse_ratio_denominator(offered_str)
+
             if cap_ratio is None or offered_ratio is None:
                 entry.update({
                     "status": "UNKNOWN",
@@ -122,7 +138,26 @@ def evaluate_profile(profile: Dict[str, Any], db: Any) -> List[Dict[str, Any]]:
             if offered_ratio > cap_ratio:
                 entry.update({
                     "status": "CONFLICT",
-                    "reason": f"Offered leverage {offered_str} exceeds statutory cap of {cap_str}",
+                    "reason": f"Offered retail leverage {offered_str} exceeds statutory cap of {cap_str}",
+                })
+                results.append(entry)
+                continue
+
+        # 3. Local presence check (if rule mandates presence)
+        presence_summary = rd.get("presence_friction_summary") or getattr(rule, "presence_friction_summary", None)
+        if presence_summary and getattr(rule, "topic", "") == "presence":
+            has_presence = profile.get("has_local_presence")
+            if has_presence is None:
+                entry.update({
+                    "status": "UNKNOWN",
+                    "reason": "has_local_presence not specified in product profile",
+                })
+                results.append(entry)
+                continue
+            if has_presence is False:
+                entry.update({
+                    "status": "CONFLICT",
+                    "reason": f"Mandatory local presence not established: {presence_summary}",
                 })
                 results.append(entry)
                 continue

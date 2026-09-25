@@ -143,8 +143,14 @@ async def review_rule(
             detail=f"Rule with id '{rule_id}' not found.",
         )
 
+    if not review_req.reviewer_id or not review_req.reviewer_id.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="reviewer_id must be a non-empty string representing the human reviewer signature.",
+        )
+
     now = datetime.utcnow()
-    rule.reviewer_id = review_req.reviewer_id
+    rule.reviewer_id = review_req.reviewer_id.strip()
     rule.reviewed_at = now
 
     if review_req.action == "approve":

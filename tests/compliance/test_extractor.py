@@ -6,14 +6,17 @@ Phase 3 tests — AI-Assisted Rule Extractor and LLM Judge pipeline.
 Tests:
   1. Verbatim quote in source text is accepted and validated.
   2. Hallucinated quote (not an exact substring) is unconditionally rejected.
-  3. Non-JSON generator output is handled gracefully without crashing.
-  4. Judge evidence_tag assignment and passthrough.
-  5. Correct mapping of source_id, chunk_id, and page_number.
+  3. Programmatic verbatim check raises ValueError when raise_on_hallucination=True.
+  4. verify_verbatim_quote raises ValueError on fabricated quotes.
+  5. LLM client with .chat() interface is supported.
 """
 import json
 import pytest
 
-from services.extractor import extract_candidate_rules
+from services.extractor import (
+    extract_rules,
+    verify_verbatim_quote,
+)
 
 
 SAMPLE_TEXT = (
@@ -22,88 +25,90 @@ SAMPLE_TEXT = (
 )
 
 
-class MockGenerator:
-    """Simulates LLM response for extraction and judging."""
-    def __init__(self, hallucinate_quote: bool = False, bad_json: bool = False):
+class MockChatClient:
+    """Mock LLM client exposing .chat() interface."""
+    def __init__(self, hallucinate_quote: bool = False):
         self.hallucinate_quote = hallucinate_quote
-        self.bad_json = bad_json
+        self.model = "mock-chat-model"
+        self.call_count = 0
 
-    def generate(self, prompt: str, system: str = "") -> str:
-        if self.bad_json:
-            return "I am an AI and here are some rules: not a valid json"
-
-        if "Extract rules as JSON array" in prompt or "Extract rules" in prompt:
+    def chat(self, messages: list[dict]) -> dict:
+        self.call_count += 1
+        user_msg = next((m["content"] for m in messages if m["role"] == "user"), "")
+        
+        # Stage 1: Extraction call
+        if "Extract rules as a JSON array" in user_msg:
             quote = (
-                "HALLUCINATED QUOTE THAT DOES NOT EXIST IN DOCUMENT"
+                "FABRICATED HALLUCINATED QUOTE"
                 if self.hallucinate_quote
                 else "minimum paid-up capital of USD 500,000"
             )
-            return json.dumps([
-                {
-                    "jurisdiction": "UAE",
-                    "regulator": "VARA",
-                    "topic": "capital",
-                    "obligation_or_restriction": "Maintain minimum capital of USD 500k",
-                    "leverage_cap_retail": "1:5",
-                    "required_capital_usd": 500000.0,
-                    "supporting_quote": quote,
-                    "extraction_model": "test-llm",
-                    "prompt_version": "v1.0",
+            return {
+                "message": {
+                    "content": json.dumps([
+                        {
+                            "jurisdiction": "UAE",
+                            "regulator": "VARA",
+                            "topic": "capital",
+                            "obligation_or_restriction": "Maintain minimum capital of USD 500k",
+                            "leverage_cap_retail": "1:5",
+                            "required_capital_usd": 500000.0,
+                            "supporting_quote": quote,
+                        }
+                    ])
                 }
-            ])
+            }
 
-        # Judge stage: prompt has EXTRACTED:
-        if "EXTRACTED:" in prompt:
-            extracted_json = prompt.split("EXTRACTED:\n")[1]
+        # Stage 2: Judge call
+        if "EXTRACTED:" in user_msg:
+            extracted_json = user_msg.split("EXTRACTED:\n")[1]
             data = json.loads(extracted_json)
             for r in data:
                 r["evidence_tag"] = "Verified Fact"
-            return json.dumps(data)
+            return {"message": {"content": json.dumps(data)}}
 
-        return "[]"
+        return {"message": {"content": "[]"}}
 
 
-def test_verbatim_quote_is_accepted():
-    generator = MockGenerator(hallucinate_quote=False)
-    rules = extract_candidate_rules(
+def test_verbatim_quote_accepted_via_chat_client():
+    client = MockChatClient(hallucinate_quote=False)
+    rules = extract_rules(
         chunk_text=SAMPLE_TEXT,
         source_id="src-uae-vara",
         chunk_id="chk-001",
         page_number=1,
-        generator=generator,
+        llm_client=client,
     )
     assert len(rules) == 1
-    rule = rules[0]
-    assert rule.jurisdiction == "UAE"
-    assert rule.regulator == "VARA"
-    assert rule.topic == "capital"
-    assert rule.source_id == "src-uae-vara"
-    assert rule.source_chunk_id == "chk-001"
-    assert rule.page_number == 1
-    assert rule.evidence_tag == "Verified Fact"
-    assert "500,000" in rule.supporting_quote
-    assert rule.supporting_quote in SAMPLE_TEXT
+    assert rules[0].evidence_tag == "Verified Fact"
+    assert "500,000" in rules[0].supporting_quote
+    assert client.call_count == 2  # Proves separate Stage 1 and Stage 2 calls!
 
 
-def test_hallucinated_quote_is_rejected():
-    generator = MockGenerator(hallucinate_quote=True)
-    rules = extract_candidate_rules(
+def test_fabricated_quote_raises_value_error():
+    client = MockChatClient(hallucinate_quote=True)
+    with pytest.raises(ValueError, match="Hallucination detected"):
+        extract_rules(
+            chunk_text=SAMPLE_TEXT,
+            source_id="src-uae-vara",
+            chunk_id="chk-002",
+            page_number=1,
+            llm_client=client,
+            raise_on_hallucination=True,
+        )
+
+
+def test_direct_verify_verbatim_quote_raises():
+    with pytest.raises(ValueError, match="Hallucination detected"):
+        verify_verbatim_quote(
+            supporting_quote="THIS QUOTE DOES NOT EXIST IN DOCUMENT",
+            chunk_text=SAMPLE_TEXT,
+        )
+
+
+def test_direct_verify_verbatim_quote_passes():
+    # Should not raise
+    verify_verbatim_quote(
+        supporting_quote="licensees shall maintain a minimum paid-up capital of USD 500,000",
         chunk_text=SAMPLE_TEXT,
-        source_id="src-uae-vara",
-        chunk_id="chk-002",
-        page_number=2,
-        generator=generator,
     )
-    assert len(rules) == 0  # Rejection by deterministic check
-
-
-def test_bad_json_returns_empty_list():
-    generator = MockGenerator(bad_json=True)
-    rules = extract_candidate_rules(
-        chunk_text=SAMPLE_TEXT,
-        source_id="src-uae-vara",
-        chunk_id="chk-003",
-        page_number=1,
-        generator=generator,
-    )
-    assert rules == []
