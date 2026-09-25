@@ -132,3 +132,6 @@ temp/
 # ==============================================================================
 .ipynb_checkpoints
 *-checkpoint.ipynb
+# Local demo database (created by run-demo.bat)
+marketsphere.db
+

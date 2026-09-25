@@ -1,13 +1,14 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MochaTrade — Regulatory Policy & Compliance Intelligence</title>
+  <title>MochaTrade â€” Regulatory Policy & Compliance Intelligence</title>
   <meta name="description" content="AI-assisted regulatory ingestion, human review queue, and deterministic compliance evaluation engine for cross-border broker trading policies.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,7 +18,7 @@
       <div class="brand">
         <div class="brand-logo">
           <div class="logo-orb"></div>
-          <span class="logo-symbol">☕</span>
+          <span class="logo-symbol">M</span>
         </div>
         <div class="brand-text">
           <div class="brand-title-wrap">
@@ -74,23 +75,23 @@
     <!-- Navigation Tabs -->
     <nav class="nav-tabs" id="main-nav-tabs">
       <button class="nav-tab active" data-tab="tab-evaluator" id="tab-btn-evaluator">
-        <span class="tab-icon">⚡</span>
         <span class="tab-label">Compliance Evaluator</span>
         <span class="tab-chip">Phase 5</span>
       </button>
       <button class="nav-tab" data-tab="tab-review" id="tab-btn-review">
-        <span class="tab-icon">⚖️</span>
         <span class="tab-label">Human Review Queue</span>
-        <span class="tab-chip" id="queue-badge-count">3 Drafts</span>
+          <span class="tab-chip" id="queue-badge-count">Drafts</span>
       </button>
       <button class="nav-tab" data-tab="tab-sources" id="tab-btn-sources">
-        <span class="tab-icon">📥</span>
         <span class="tab-label">Source Ingestion</span>
         <span class="tab-chip">Phase 1 &amp; 2</span>
       </button>
       <button class="nav-tab" data-tab="tab-architecture" id="tab-btn-architecture">
-        <span class="tab-icon">🏛️</span>
         <span class="tab-label">Architecture &amp; Provenance</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-analyzer" id="tab-btn-analyzer">
+        <span class="tab-label">AI Rule Analyzer</span>
+        <span class="tab-chip">New</span>
       </button>
     </nav>
 
@@ -174,7 +175,6 @@
 
               <div class="form-actions">
                 <button type="submit" class="btn btn-primary btn-glow" id="btn-run-eval">
-                  <span class="btn-icon">⚡</span>
                   Run Compliance Evaluation
                 </button>
                 <button type="button" class="btn btn-outline" id="btn-clear-eval">Reset</button>
@@ -194,7 +194,7 @@
 
             <!-- Summary Banner -->
             <div class="verdict-banner" id="verdict-banner">
-              <div class="verdict-status-icon" id="verdict-status-icon">⚖️</div>
+              <div class="verdict-status-icon" id="verdict-status-icon">âš–ï¸</div>
               <div class="verdict-details">
                 <h3 id="verdict-title">No Evaluation Run Yet</h3>
                 <p id="verdict-summary">Select a jurisdiction and parameters on the left, then click <strong>Run Compliance Evaluation</strong>.</p>
@@ -225,9 +225,9 @@
               <label>Status Filter:</label>
               <div class="btn-toggle-group" id="review-status-filter">
                 <button class="toggle-btn active" data-status="all">All</button>
-                <button class="toggle-btn" data-status="draft">Draft (3)</button>
-                <button class="toggle-btn" data-status="approved">Approved (4)</button>
-                <button class="toggle-btn" data-status="rejected">Rejected (0)</button>
+                <button class="toggle-btn" data-status="draft">Draft</button>
+                <button class="toggle-btn" data-status="approved">Approved</button>
+                <button class="toggle-btn" data-status="rejected">Rejected</button>
               </div>
             </div>
 
@@ -340,7 +340,6 @@
                 <div class="file-dropzone" id="file-dropzone">
                   <input type="file" id="source-file-input" class="file-input-hidden" accept=".pdf,.docx,.html,.txt">
                   <div class="dropzone-content">
-                    <span class="dropzone-icon">📄</span>
                     <p class="dropzone-main-text">Drag &amp; drop policy document, or <span class="browse-link">browse</span></p>
                     <span class="dropzone-hint">Supports PDF, DOCX, HTML (Max 50MB)</span>
                   </div>
@@ -393,7 +392,7 @@
             <!-- Step 1 -->
             <div class="flow-card">
               <div class="flow-step-num">01</div>
-              <div class="flow-icon">📥</div>
+              <div class="flow-icon">ðŸ“¥</div>
               <h3>Source Ingestion</h3>
               <p>Preserves raw bytes in MinIO, computes deterministic SHA-256 hash, and deduplicates against the source registry.</p>
               <div class="flow-tech-tags">
@@ -403,12 +402,12 @@
               </div>
             </div>
 
-            <div class="flow-connector">➔</div>
+            <div class="flow-connector">âž”</div>
 
             <!-- Step 2 -->
             <div class="flow-card">
               <div class="flow-step-num">02</div>
-              <div class="flow-icon">📑</div>
+              <div class="flow-icon">ðŸ“‘</div>
               <h3>v5 Per-Page Router</h3>
               <p>PyMuPDF fast triage routes clean pages to PyMuPDF4LLM, tables to Docling, and scans to DeepSeek-OCR2 (HF Transformers).</p>
               <div class="flow-tech-tags">
@@ -418,12 +417,12 @@
               </div>
             </div>
 
-            <div class="flow-connector">➔</div>
+            <div class="flow-connector">âž”</div>
 
             <!-- Step 3 -->
             <div class="flow-card">
               <div class="flow-step-num">03</div>
-              <div class="flow-icon">🤖</div>
+              <div class="flow-icon">ðŸ¤–</div>
               <h3>AI Extraction &amp; Judge</h3>
               <p>LLM extracts candidate rules, LLM-as-a-judge adds <code>evidence_tag</code>, and a deterministic verbatim check discards hallucinated quotes.</p>
               <div class="flow-tech-tags">
@@ -433,12 +432,12 @@
               </div>
             </div>
 
-            <div class="flow-connector">➔</div>
+            <div class="flow-connector">âž”</div>
 
             <!-- Step 4 -->
             <div class="flow-card">
               <div class="flow-step-num">04</div>
-              <div class="flow-icon">⚖️</div>
+              <div class="flow-icon">âš–ï¸</div>
               <h3>Human Review Gate</h3>
               <p>Compliance officer approves, rejects, or edits rules. Only approved rules are committed to the queryable rule store.</p>
               <div class="flow-tech-tags">
@@ -448,12 +447,12 @@
               </div>
             </div>
 
-            <div class="flow-connector">➔</div>
+            <div class="flow-connector">âž”</div>
 
             <!-- Step 5 -->
             <div class="flow-card">
               <div class="flow-step-num">05</div>
-              <div class="flow-icon">⚡</div>
+              <div class="flow-icon">âš¡</div>
               <h3>Deterministic Evaluator</h3>
               <p>Evaluates broker profiles against approved rules without LLMs in the hot path. Returns PASS, CONFLICT, or UNKNOWN with citations.</p>
               <div class="flow-tech-tags">
@@ -488,6 +487,135 @@
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 5: AI RULE ANALYZER                                -->
+      <!-- ======================================================== -->
+      <section class="tab-panel" id="tab-analyzer">
+        <div class="az-wrap">
+
+          <!-- Stage 1: Input -->
+          <div class="az-stage" id="az-stage-input">
+            <div class="az-hero">
+              <span class="az-eyebrow">Compliance Intelligence</span>
+              <h2 class="az-title">AI Rule Analyzer</h2>
+              <p class="az-sub">Select a country, provide your rules, and MarketSphere measures them against the country's identified regulatory requirements.</p>
+            </div>
+
+            <div class="panel-card az-input-card">
+              <label for="az-country">Where are you evaluating compliance?</label>
+              <select id="az-country" class="form-select"></select>
+              <span class="field-hint" id="az-country-note">Loading countries…</span>
+
+              <details class="az-context" id="az-context">
+                <summary>Context <span class="field-hint" style="display:inline">optional — only what affects applicability</span></summary>
+                <div class="form-row" style="margin-top: 12px;">
+                  <div class="form-group flex-1">
+                    <label for="az-ctx-product">Product</label>
+                    <input type="text" id="az-ctx-product" placeholder="e.g. FX brokerage service" autocomplete="off">
+                  </div>
+                  <div class="form-group flex-1">
+                    <label for="az-ctx-operation">Operation</label>
+                    <select id="az-ctx-operation" class="form-select">
+                      <option value="">Not specified</option>
+                      <option value="import">Import</option>
+                      <option value="export">Export</option>
+                      <option value="domestic">Domestic</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-row">
+                  <div class="form-group flex-1">
+                    <label for="az-ctx-ncm">NCM / HS code</label>
+                    <input type="text" id="az-ctx-ncm" placeholder="e.g. 8471.30" autocomplete="off">
+                  </div>
+                  <div class="form-group flex-1">
+                    <label for="az-ctx-destination">Destination</label>
+                    <input type="text" id="az-ctx-destination" placeholder="e.g. São Paulo" autocomplete="off">
+                  </div>
+                </div>
+              </details>
+
+              <label for="az-text" style="margin-top: 16px;">Your rules</label>
+              <textarea id="az-text" rows="7" placeholder="Paste or type your rules here, one per line...&#10;&#10;1. Revenue must exceed â‚¹100 crore.&#10;2. The company must be profitable."></textarea>
+              <div class="az-input-meta">
+                <span class="field-hint" id="az-text-count">0 rules detected</span>
+                <button type="button" class="az-link-btn" id="az-sample-btn">Load sample rules</button>
+              </div>
+
+              <div class="az-file-chip" id="az-file-chip" style="display: none;">
+                <div class="az-file-info">
+                  <div>
+                    <div class="az-file-name" id="az-file-name">document.pdf</div>
+                    <div class="az-file-sub" id="az-file-sub">PDF Â· 0 KB</div>
+                    <div class="az-file-state" id="az-file-state"></div>
+                  </div>
+                </div>
+                <div class="az-file-actions">
+                  <button type="button" class="btn btn-outline btn-sm" id="az-file-replace">Replace</button>
+                  <button type="button" class="btn btn-reject btn-sm" id="az-file-remove">Remove</button>
+                </div>
+              </div>
+
+              <div class="az-dropzone" id="az-dropzone">
+                <input type="file" id="az-file-input" class="file-input-hidden" accept=".pdf,.docx,.doc,.txt,.md">
+                <p class="dropzone-main-text">Drag &amp; drop your document here or <span class="browse-link">browse files</span></p>
+                <span class="dropzone-hint">PDF â€¢ DOCX â€¢ TXT (max 10 MB)</span>
+              </div>
+
+              <div class="az-error" id="az-input-error" style="display: none;"></div>
+
+              <div class="form-actions az-actions">
+                <button type="button" class="btn btn-primary btn-glow" id="az-btn-review">
+                  Review Rules
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 2: Review extracted rules -->
+          <div class="az-stage" id="az-stage-review" style="display: none;">
+            <div class="az-stage-head">
+              <div>
+                <span class="card-badge">Step 2 of 3 · Review</span>
+                <h2>Rules detected</h2>
+                <p class="card-desc">Check what was captured. Edit, delete, or add rules before analysis.</p>
+              </div>
+              <span class="count-tag" id="az-review-count">0 rules</span>
+            </div>
+
+            <div class="panel-card">
+              <div class="az-review-list" id="az-review-list"></div>
+              <div class="form-actions az-actions">
+                <button type="button" class="btn btn-outline" id="az-btn-back-input">Back</button>
+                <button type="button" class="btn btn-secondary" id="az-btn-add-rule">+ Add rule</button>
+                <button type="button" class="btn btn-primary btn-glow" id="az-btn-analyze">
+                  Analyze
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stage 3: Compliance report -->
+          <div class="az-stage" id="az-stage-result" style="display: none;">
+            <div class="az-stage-head">
+              <div>
+                <span class="card-badge">Step 3 of 3 · Compliance report</span>
+                <h2 id="az-report-title">Compliance Analysis</h2>
+              </div>
+              <button type="button" class="btn btn-outline btn-sm" id="az-btn-edit-rules">Edit rules &amp; re-analyze</button>
+            </div>
+
+            <div class="az-chat" id="az-chat"></div>
+
+            <form class="az-composer" id="az-composer">
+              <input type="text" id="az-chat-input" placeholder="Ask about this analysis — e.g. Why is Rule 2 non-compliant?" autocomplete="off" maxlength="2000">
+              <button type="submit" class="btn btn-primary" id="az-chat-send">Send</button>
+            </form>
+          </div>
+
         </div>
       </section>
 
@@ -543,9 +671,22 @@
     </div>
 
     <!-- Notification Toast -->
-    <div class="toast" id="toast" style="display: none;"></div>
+    <div class="toast" id="toast" style="display: none;" role="status" aria-live="polite"></div>
+
+    <footer class="app-footer">
+      <div class="footer-brand">
+        <span class="brand-name" style="font-size: 15px;">Mocha<span class="gradient-text">Trade</span></span>
+        <span class="footer-tag">Deterministic compliance engine Â· 15 markets Â· Zero-hallucination verdicts</span>
+      </div>
+      <div class="footer-links">
+        <span class="footer-hint" id="footer-mode-hint">Demo Engine (Active) â€” no backend required</span>
+        <span class="footer-dot">Â·</span>
+        <button class="footer-link-btn" id="footer-config-btn" type="button">API Config</button>
+      </div>
+    </footer>
   </div>
 
   <script src="app.js"></script>
+  <script src="analyzer.js"></script>
 </body>
 </html>

@@ -1,12 +1,25 @@
 from fastapi import APIRouter, File, HTTPException, UploadFile, status
 
-from api.dependencies import chunker, embeddings, parser_router, retriever, uploader
+from api import dependencies as deps
 from schemas.document import (
     DocumentIngestItem,
     DocumentIngestResponse,
 )
 
 router = APIRouter(prefix="/documents", tags=["Documents"])
+
+
+def _require(service, name: str):
+    if service is None:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                f"{name} is unavailable in this environment "
+                "(missing optional infrastructure dependency). "
+                "Run the full docker-compose stack for document ingestion."
+            ),
+        )
+    return service
 
 
 # POST /api/v1/documents/
@@ -26,6 +39,12 @@ async def ingest_documents(
     if not files:
         raise HTTPException(status_code=400, detail="At least one file is required")
 
+    uploader = _require(deps.uploader, "Uploader")
+    parser_router = _require(deps.parser_router, "ParserRouter")
+    chunker = _require(deps.chunker, "Chunker")
+    embeddings = _require(deps.embeddings, "Embeddings")
+    retriever = _require(deps.retriever, "Retriever")
+
     # Upload files to MinIO
     uploaded_documents = uploader.upload_files(files)
 
@@ -41,7 +60,7 @@ async def ingest_documents(
 
         # Chunk text and attach metadata using HybridChunker (or legacy chunker)
         chunk_result = chunker.split(docling_doc, doc_id, filename)
-        
+
         # Handle both the new list[TextChunk] and the legacy tuple format in case HybridChunker is not fully implemented
         if isinstance(chunk_result, tuple) and len(chunk_result) == 3:
             chunks, metadatas, chunk_ids = chunk_result
@@ -78,4 +97,3 @@ async def ingest_documents(
         count=len(ingested_items),
         documents=ingested_items,
     )
-

@@ -3,6 +3,7 @@ api/v1/endpoints/rules.py — Regulatory rule management and human review API.
 
 Provides:
   GET  /api/v1/rules                 — List regulatory rules filtered by review_status and jurisdiction.
+  POST /api/v1/rules/evaluate        — Deterministic evaluation of a broker profile.
   GET  /api/v1/rules/{rule_id}       — Retrieve a single rule with complete provenance and evidence_tag.
   POST /api/v1/rules                 — Ingest new draft candidate rules from extraction pipeline.
   POST /api/v1/rules/{rule_id}/review — Human reviewer action: approve, reject, or edit with version increment.
@@ -19,6 +20,9 @@ from core.database import get_db
 from models.rule import ComplianceRule
 from schemas.rule import (
     CandidateRule,
+    EvaluateProfileRequest,
+    EvaluateProfileResponse,
+    EvaluationResultItem,
     RuleListResponse,
     RuleResponse,
     RuleReviewRequest,
@@ -45,6 +49,52 @@ def _to_rule_response(rule: ComplianceRule) -> RuleResponse:
         reviewer_id=rule.reviewer_id,
         reviewed_at=rule.reviewed_at.isoformat() if rule.reviewed_at else None,
         created_at=rule.created_at.isoformat() if rule.created_at else None,
+    )
+
+
+@router.post(
+    "/evaluate",
+    response_model=EvaluateProfileResponse,
+    summary="Deterministically evaluate a broker profile",
+    description=(
+        "Evaluates a broker/product profile against approved regulatory rules "
+        "for the given jurisdiction. No LLM in the hot path; missing facts "
+        "evaluate strictly to UNKNOWN."
+    ),
+)
+async def evaluate_broker_profile(
+    profile: EvaluateProfileRequest,
+    db: AsyncSession = Depends(get_db),
+) -> EvaluateProfileResponse:
+    from services.evaluator import evaluate_profile
+
+    try:
+        result = await db.execute(
+            select(ComplianceRule).where(
+                ComplianceRule.jurisdiction == profile.jurisdiction,
+                ComplianceRule.review_status == "approved",
+            )
+        )
+        approved_rules = list(result.scalars().all())
+    except Exception as exc:
+        logger.exception("Rule evaluation failed while loading approved rules")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Rule store unavailable: {exc}",
+        )
+
+    profile_dict = {
+        "jurisdiction": profile.jurisdiction,
+        "product_type": profile.product_type,
+        "capital_available_usd": profile.capital_available_usd,
+        "leverage_offered": profile.leverage_offered,
+        "has_local_presence": profile.has_local_presence,
+    }
+    raw_results = evaluate_profile(profile_dict, approved_rules)
+    return EvaluateProfileResponse(
+        jurisdiction=profile.jurisdiction,
+        total=len(raw_results),
+        results=[EvaluationResultItem(**r) for r in raw_results],
     )
 
 

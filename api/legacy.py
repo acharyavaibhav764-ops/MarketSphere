@@ -1,5 +1,5 @@
-from fastapi import APIRouter, File, UploadFile
-from api.dependencies import chunker, embeddings, parser, retriever, uploader
+from fastapi import APIRouter, File, HTTPException, UploadFile
+from api import dependencies as deps
 from api.v1.endpoints.query import query_pipeline
 from schemas import (
     FileIndexResponse,
@@ -12,6 +12,19 @@ from schemas import (
 legacy_router = APIRouter(tags=["Legacy (v0.1/v0.3)"])
 
 
+def _require(service, name: str):
+    if service is None:
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                f"{name} is unavailable in this environment "
+                "(missing optional infrastructure dependency). "
+                "Run the full docker-compose stack for RAG ingestion."
+            ),
+        )
+    return service
+
+
 @legacy_router.post(
     "/upload",
     response_model=FileUploadResponse,
@@ -19,6 +32,7 @@ legacy_router = APIRouter(tags=["Legacy (v0.1/v0.3)"])
     summary="[Legacy] Upload multiple files",
 )
 async def legacy_upload(files: list[UploadFile] = File(...)) -> FileUploadResponse:
+    uploader = _require(deps.uploader, "Uploader")
     uploaded = uploader.upload_files(files)
     return FileUploadResponse(
         message="Files uploaded successfully",
@@ -41,6 +55,11 @@ async def legacy_upload(files: list[UploadFile] = File(...)) -> FileUploadRespon
     summary="[Legacy] Chunk and embed one uploaded file",
 )
 async def legacy_chunk_and_embed(file_id: str) -> FileIndexResponse:
+    uploader = _require(deps.uploader, "Uploader")
+    parser = _require(deps.parser, "Parser")
+    chunker = _require(deps.chunker, "Chunker")
+    embeddings = _require(deps.embeddings, "Embeddings")
+    retriever = _require(deps.retriever, "Retriever")
     content, filename = uploader.download_file(file_id)
     pages = parser.parse(content, filename)
     chunks, metadatas, chunk_ids = chunker.split(pages, file_id, filename)
@@ -68,4 +87,3 @@ async def legacy_chunk_and_embed(file_id: str) -> FileIndexResponse:
 )
 async def legacy_generate(request: QueryRequest) -> QueryResponse:
     return await query_pipeline(request=request)
-

@@ -931,6 +931,8 @@ function init() {
   setupEvaluator();
   setupReviewQueue();
   setupSourceIngestion();
+  setupModalDismiss();
+  setupFooter();
 
   // Initial UI Render
   renderReviewQueue();
@@ -942,6 +944,44 @@ function init() {
   const firstDraft = state.rules.find(r => r.review_status === 'draft') || state.rules[0];
   if (firstDraft) {
     selectRuleForInspection(firstDraft.rule_id);
+  }
+
+  // Auto-run a default evaluation so the verdict panel is never empty.
+  try {
+    runEvaluation();
+  } catch (e) {
+    /* non-fatal: user can run manually */
+  }
+
+  // If the user left Live mode on, attempt a backend sync in the background.
+  if (state.mode === 'live') {
+    loadLiveData();
+  }
+}
+
+function setupModalDismiss() {
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      elements.configModal.style.display = 'none';
+      elements.editRuleModal.style.display = 'none';
+    }
+  });
+  [elements.configModal, elements.editRuleModal].forEach(modal => {
+    if (!modal) return;
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.style.display = 'none';
+    });
+  });
+}
+
+function setupFooter() {
+  const footerBtn = document.getElementById('footer-config-btn');
+  if (footerBtn) {
+    footerBtn.addEventListener('click', () => {
+      elements.apiBaseUrlInput.value = state.apiBaseUrl;
+      elements.apiModeSelect.value = state.mode;
+      elements.configModal.style.display = 'flex';
+    });
   }
 }
 
@@ -976,14 +1016,17 @@ function setupConfigModal() {
     elements.configModal.style.display = 'none';
   });
 
-  elements.saveConfigBtn.addEventListener('click', () => {
-    state.apiBaseUrl = elements.apiBaseUrlInput.value.trim();
+  elements.saveConfigBtn.addEventListener('click', async () => {
+    state.apiBaseUrl = elements.apiBaseUrlInput.value.trim().replace(/\/$/, '');
     state.mode = elements.apiModeSelect.value;
     localStorage.setItem('mochatrade_api_url', state.apiBaseUrl);
     localStorage.setItem('mochatrade_mode', state.mode);
     elements.configModal.style.display = 'none';
     updateApiStatusIndicator();
-    showToast(`Saved configuration (${state.mode} mode)`);
+    showToast(`Saved configuration (${state.mode} mode)`, 'success');
+    if (state.mode === 'live') {
+      await loadLiveData();
+    }
   });
 
   elements.testConnectionBtn.addEventListener('click', async () => {
@@ -1004,23 +1047,154 @@ function setupConfigModal() {
 }
 
 function updateApiStatusIndicator() {
+  const footerHint = document.getElementById('footer-mode-hint');
   if (state.mode === 'live') {
     elements.apiStatusDot.style.background = '#38bdf8';
     elements.apiStatusDot.style.boxShadow = '0 0 10px #38bdf8';
     elements.apiStatusText.innerText = 'Live API: ' + state.apiBaseUrl.replace(/https?:\/\//, '');
+    if (footerHint) footerHint.innerText = 'Live backend mode — syncs rules & sources when reachable';
   } else {
     elements.apiStatusDot.style.background = '#10b981';
     elements.apiStatusDot.style.boxShadow = '0 0 10px #10b981';
     elements.apiStatusText.innerText = 'Demo Engine (Active)';
+    if (footerHint) footerHint.innerText = 'Demo Engine (Active) — no backend required';
   }
 }
 
+let _toastTimer = null;
 function showToast(message, type = 'info') {
   elements.toast.innerText = message;
+  elements.toast.className = 'toast toast-' + (type === 'info' ? 'info' : type);
   elements.toast.style.display = 'block';
-  setTimeout(() => {
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => {
     elements.toast.style.display = 'none';
-  }, 3500);
+  }, 4000);
+}
+
+// =============================================================================
+// Live Backend Integration (graceful: falls back to local demo data)
+// =============================================================================
+
+function apiUrl(path) {
+  const base = (state.apiBaseUrl || '').replace(/\/$/, '');
+  return base + path;
+}
+
+async function apiFetch(path, options = {}, timeoutMs = 12000) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(apiUrl(path), { ...options, signal: controller.signal });
+    if (!res.ok) {
+      const text = await res.text().catch(() => '');
+      throw new Error(`HTTP ${res.status}${text ? ': ' + text.slice(0, 160) : ''}`);
+    }
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) return await res.json();
+    return await res.text();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function normalizeBackendRule(r) {
+  if (!r || typeof r !== 'object') return null;
+  const data = r.rule_data || {};
+  return {
+    rule_id: r.rule_id,
+    rule_version: r.rule_version ?? 1,
+    source_id: r.source_id,
+    jurisdiction: r.jurisdiction,
+    regulator: r.regulator || data.regulator || 'Unknown',
+    topic: r.topic || data.topic || 'general',
+    obligation: data.obligation_or_restriction || data.obligation || r.topic || 'Regulatory directive',
+    supporting_quote: data.supporting_quote || '',
+    required_capital_usd: r.required_capital ?? data.required_capital_usd ?? null,
+    leverage_cap_retail: r.leverage_cap ?? data.leverage_cap_retail ?? null,
+    presence_friction_summary: data.presence_friction_summary || null,
+    evidence_tag: r.evidence_tag || data.evidence_tag || 'Analyst Estimate',
+    review_status: r.review_status || 'draft',
+    reviewer_id: r.reviewer_id || null,
+    reviewed_at: r.reviewed_at || null,
+    page_number: data.page_number ?? null,
+    section_heading: data.section_heading || '',
+    extraction_model: data.extraction_model || 'backend',
+  };
+}
+
+function normalizeBackendSource(s) {
+  if (!s || typeof s !== 'object') return null;
+  return {
+    source_id: s.source_id,
+    jurisdiction: s.jurisdiction,
+    regulator: s.regulator,
+    title: s.title,
+    source_type: s.source_type || 'PDF',
+    instrument_type: s.instrument_type || 'General',
+    source_url: s.source_url || null,
+    content_hash: s.content_hash || 'pending',
+    source_status: s.source_status || 'active',
+    processing_status: s.processing_status || 'fetched',
+    storage_uri: s.storage_uri || '',
+  };
+}
+
+async function loadLiveData() {
+  if (state.mode !== 'live') return;
+  showToast('Connecting to live backend…', 'info');
+  let synced = false;
+  try {
+    const rulesData = await apiFetch('/rules');
+    const list = Array.isArray(rulesData) ? rulesData : (rulesData.rules || []);
+    const normalized = list.map(normalizeBackendRule).filter(Boolean);
+    if (normalized.length > 0) {
+      state.rules = normalized;
+      synced = true;
+    }
+  } catch (e) {
+    // fall through to demo data
+  }
+  try {
+    const srcData = await apiFetch('/sources');
+    const list = Array.isArray(srcData) ? srcData : (srcData.sources || []);
+    const normalized = list.map(normalizeBackendSource).filter(Boolean);
+    if (normalized.length > 0) {
+      state.sources = normalized;
+      synced = true;
+    }
+  } catch (e) {
+    // fall through to demo data
+  }
+  renderReviewQueue();
+  renderSourcesLedger();
+  updateQueueBadges();
+  const firstDraft = state.rules.find(r => r.review_status === 'draft') || state.rules[0];
+  if (firstDraft) selectRuleForInspection(firstDraft.rule_id);
+  if (synced) {
+    showToast('Live backend synced — showing server rules & sources.', 'success');
+  } else {
+    showToast('Backend unreachable — continuing in local Demo Mode.', 'warning');
+  }
+}
+
+async function syncReviewToBackend(ruleId, action, editedRuleData = null) {
+  if (state.mode !== 'live') return true;
+  try {
+    await apiFetch(`/rules/${encodeURIComponent(ruleId)}/review`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action,
+        reviewer_id: 'compliance.lead@mochatrade.io',
+        edited_rule_data: editedRuleData,
+      }),
+    });
+    return true;
+  } catch (e) {
+    showToast('Backend review sync failed — change kept locally.', 'warning');
+    return false;
+  }
 }
 
 // =============================================================================
@@ -1129,7 +1303,7 @@ function setupEvaluator() {
   });
 }
 
-function runEvaluation() {
+async function runEvaluation() {
   const jurisdiction = elements.evalJurisdiction.value;
   const productType = elements.evalProductType.value;
   const capitalVal = elements.evalCapital.value.trim();
@@ -1143,8 +1317,46 @@ function runEvaluation() {
     leverage_offered: leverage,
   };
 
-  const results = evaluateProfileDeterministically(profile);
-  renderEvaluationResults(profile, results);
+  const runBtn = document.getElementById('btn-run-eval');
+  const originalLabel = runBtn ? runBtn.innerHTML : '';
+  if (runBtn) {
+    runBtn.disabled = true;
+    runBtn.classList.add('btn-loading');
+    runBtn.innerHTML = '<span class="btn-icon">⏳</span> Evaluating…';
+  }
+
+  try {
+    // Live backend first (deterministic server-side evaluation); fall back locally.
+    if (state.mode === 'live') {
+      try {
+        const data = await apiFetch('/rules/evaluate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(profile),
+        });
+        const results = (data.results || []).map(r => ({
+          rule_id: r.rule_id,
+          rule_version: r.rule_version ?? 1,
+          topic: r.topic || 'general',
+          supporting_quote: r.supporting_quote || '',
+          status: r.status,
+          reason: r.reason || '',
+        }));
+        renderEvaluationResults(profile, results);
+        return;
+      } catch (e) {
+        showToast('Live evaluation unavailable — used local deterministic engine.', 'warning');
+      }
+    }
+    const results = evaluateProfileDeterministically(profile);
+    renderEvaluationResults(profile, results);
+  } finally {
+    if (runBtn) {
+      runBtn.disabled = false;
+      runBtn.classList.remove('btn-loading');
+      runBtn.innerHTML = originalLabel;
+    }
+  }
 }
 
 function resetVerdictBanner() {
@@ -1398,7 +1610,7 @@ function selectRuleForInspection(ruleId) {
 }
 
 // Global action handlers attached to window
-window.approveCurrentRule = function(ruleId) {
+window.approveCurrentRule = async function(ruleId) {
   const rule = state.rules.find(r => r.rule_id === ruleId);
   if (!rule) return;
 
@@ -1408,10 +1620,16 @@ window.approveCurrentRule = function(ruleId) {
 
   updateQueueBadges();
   selectRuleForInspection(ruleId);
-  showToast(`Rule '${ruleId}' approved for deterministic evaluator.`);
+  const synced = await syncReviewToBackend(ruleId, 'approve');
+  showToast(
+    synced
+      ? `Rule '${ruleId}' approved for deterministic evaluator.`
+      : `Rule '${ruleId}' approved locally (backend out of reach).`,
+    synced ? 'success' : 'warning',
+  );
 };
 
-window.rejectCurrentRule = function(ruleId) {
+window.rejectCurrentRule = async function(ruleId) {
   const rule = state.rules.find(r => r.rule_id === ruleId);
   if (!rule) return;
 
@@ -1421,7 +1639,13 @@ window.rejectCurrentRule = function(ruleId) {
 
   updateQueueBadges();
   selectRuleForInspection(ruleId);
-  showToast(`Rule '${ruleId}' marked as rejected.`, 'warning');
+  const synced = await syncReviewToBackend(ruleId, 'reject');
+  showToast(
+    synced
+      ? `Rule '${ruleId}' marked as rejected.`
+      : `Rule '${ruleId}' rejected locally (backend out of reach).`,
+    'warning',
+  );
 };
 
 window.openEditRuleModal = function(ruleId) {
@@ -1438,18 +1662,24 @@ window.openEditRuleModal = function(ruleId) {
   elements.editRuleModal.style.display = 'flex';
 };
 
-function handleEditRuleSubmit(e) {
+async function handleEditRuleSubmit(e) {
   e.preventDefault();
   const ruleId = elements.editRuleId.value;
   const rule = state.rules.find(r => r.rule_id === ruleId);
   if (!rule) return;
+
+  const reviewer = elements.editRuleReviewer.value.trim();
+  if (!reviewer) {
+    showToast('Reviewer signature is required to approve a rule version.', 'error');
+    return;
+  }
 
   rule.topic = elements.editRuleTopic.value.trim();
   rule.obligation = elements.editRuleObligation.value.trim();
   rule.leverage_cap_retail = elements.editRuleLeverage.value.trim() || null;
   rule.required_capital_usd = elements.editRuleCapital.value ? parseFloat(elements.editRuleCapital.value) : null;
   rule.evidence_tag = elements.editRuleEvidence.value;
-  rule.reviewer_id = elements.editRuleReviewer.value.trim();
+  rule.reviewer_id = reviewer;
   rule.reviewed_at = new Date().toISOString();
 
   // Version increment
@@ -1459,7 +1689,20 @@ function handleEditRuleSubmit(e) {
   elements.editRuleModal.style.display = 'none';
   updateQueueBadges();
   selectRuleForInspection(ruleId);
-  showToast(`Rule updated to v${rule.rule_version} and approved.`);
+  const synced = await syncReviewToBackend(ruleId, 'edit', {
+    topic: rule.topic,
+    obligation_or_restriction: rule.obligation,
+    leverage_cap_retail: rule.leverage_cap_retail,
+    required_capital_usd: rule.required_capital_usd,
+    evidence_tag: rule.evidence_tag,
+    supporting_quote: rule.supporting_quote,
+  });
+  showToast(
+    synced
+      ? `Rule updated to v${rule.rule_version} and approved.`
+      : `Rule updated to v${rule.rule_version} locally (backend out of reach).`,
+    synced ? 'success' : 'warning',
+  );
 }
 
 // =============================================================================
@@ -1513,16 +1756,32 @@ async function handleSelectedFile(file) {
 
   const reader = new FileReader();
   reader.onload = async (e) => {
-    uploadedFileBytes = e.target.result;
-    const hashBuffer = await crypto.subtle.digest('SHA-256', uploadedFileBytes);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    currentComputedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    elements.previewHash.innerText = `SHA-256: ${currentComputedHash}`;
+    try {
+      uploadedFileBytes = e.target.result;
+      if (crypto.subtle && crypto.subtle.digest) {
+        const hashBuffer = await crypto.subtle.digest('SHA-256', uploadedFileBytes);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        currentComputedHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      } else {
+        // Non-secure context fallback: deterministic FNV-1a hash (demo only).
+        const bytes = new Uint8Array(uploadedFileBytes);
+        let h1 = 0x811c9dc5;
+        for (let i = 0; i < bytes.length; i++) {
+          h1 ^= bytes[i];
+          h1 = Math.imul(h1, 0x01000193) >>> 0;
+        }
+        currentComputedHash = 'fnv1a-' + h1.toString(16).padStart(8, '0');
+      }
+      elements.previewHash.innerText = `SHA-256: ${currentComputedHash}`;
+    } catch (err) {
+      elements.previewHash.innerText = 'Could not hash file — metadata-only entry.';
+      currentComputedHash = null;
+    }
   };
   reader.readAsArrayBuffer(file);
 }
 
-function handleSourceFormSubmit(e) {
+async function handleSourceFormSubmit(e) {
   e.preventDefault();
 
   const jurisdiction = elements.sourceJurisdiction.value.trim();
@@ -1532,38 +1791,92 @@ function handleSourceFormSubmit(e) {
   const instrumentType = elements.sourceInstrument.value;
   const sourceUrl = elements.sourceUrl.value.trim();
 
-  const hash = currentComputedHash || '8f43a9b1c7d24e65bf3109a823c4e12365df8901bca2345e6790a12b3456789a';
-
-  // Check for duplicate hash
-  const existing = state.sources.find(s => s.content_hash === hash);
-  if (existing) {
-    showToast(`Duplicate Rejected: Document with this SHA-256 hash is already registered (${existing.source_id})`, 'warning');
+  if (!jurisdiction || !regulator || !title) {
+    showToast('Jurisdiction, regulator and title are required.', 'error');
     return;
   }
 
-  const newSource = {
-    source_id: `src-${jurisdiction.toLowerCase()}-${Date.now().toString(36)}`,
-    jurisdiction,
-    regulator,
-    title,
-    source_type: sourceType,
-    instrument_type: instrumentType,
-    source_url: sourceUrl || null,
-    content_hash: hash,
-    source_status: 'active',
-    processing_status: 'fetched',
-    storage_uri: `sources/${hash.slice(0, 16)}/${elements.previewFilename.innerText || 'doc.pdf'}`,
-  };
+  const submitBtn = document.getElementById('btn-submit-source');
+  const originalLabel = submitBtn ? submitBtn.innerHTML : '';
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.classList.add('btn-loading');
+    submitBtn.innerHTML = '<span>Registering…</span>';
+  }
 
-  state.sources.unshift(newSource);
-  renderSourcesLedger();
-  showToast(`Source registered successfully with SHA-256: ${hash.slice(0, 16)}...`);
+  try {
+    // Live backend: upload the actual file bytes when available.
+    if (state.mode === 'live') {
+      try {
+        const file = elements.sourceFileInput.files && elements.sourceFileInput.files[0];
+        if (file) {
+          const form = new FormData();
+          form.append('file', file, file.name);
+          form.append('jurisdiction', jurisdiction);
+          form.append('regulator', regulator);
+          form.append('title', title);
+          form.append('source_type', sourceType);
+          if (sourceUrl) form.append('source_url', sourceUrl);
+          if (instrumentType) form.append('instrument_type', instrumentType);
+          const base = (state.apiBaseUrl || '').replace(/\/$/, '');
+          const res = await fetch(base + '/sources/ingest', { method: 'POST', body: form });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const created = await res.json();
+          showToast(
+            created.status === 'duplicate'
+              ? 'Duplicate detected on server — source already registered.'
+              : `Source registered on server (${created.source_id || 'created'}).`,
+            created.status === 'duplicate' ? 'warning' : 'success',
+          );
+        } else {
+          showToast('No file attached — ledger entry kept locally only.', 'warning');
+        }
+      } catch (err) {
+        showToast('Backend ingest failed — ledger entry kept locally.', 'warning');
+      }
+    } else if (!uploadedFileBytes) {
+      showToast('No file attached — demo ledger entry recorded from metadata.', 'warning');
+    }
 
-  // Reset form
-  elements.filePreviewCard.style.display = 'none';
-  uploadedFileBytes = null;
-  currentComputedHash = null;
-  elements.sourceFileInput.value = '';
+    const hash = currentComputedHash || '8f43a9b1c7d24e65bf3109a823c4e12365df8901bca2345e6790a12b3456789a';
+
+    // Check for duplicate hash
+    const existing = state.sources.find(s => s.content_hash === hash);
+    if (existing) {
+      showToast(`Duplicate Rejected: Document with this SHA-256 hash is already registered (${existing.source_id})`, 'warning');
+      return;
+    }
+
+    const newSource = {
+      source_id: `src-${jurisdiction.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${Date.now().toString(36)}`,
+      jurisdiction,
+      regulator,
+      title,
+      source_type: sourceType,
+      instrument_type: instrumentType,
+      source_url: sourceUrl || null,
+      content_hash: hash,
+      source_status: 'active',
+      processing_status: 'fetched',
+      storage_uri: `sources/${hash.slice(0, 16)}/${elements.previewFilename.innerText || 'doc.pdf'}`,
+    };
+
+    state.sources.unshift(newSource);
+    renderSourcesLedger();
+    showToast(`Source registered successfully with SHA-256: ${hash.slice(0, 16)}...`, 'success');
+
+    // Reset form
+    elements.filePreviewCard.style.display = 'none';
+    uploadedFileBytes = null;
+    currentComputedHash = null;
+    elements.sourceFileInput.value = '';
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('btn-loading');
+      submitBtn.innerHTML = originalLabel;
+    }
+  }
 }
 
 function renderSourcesLedger() {

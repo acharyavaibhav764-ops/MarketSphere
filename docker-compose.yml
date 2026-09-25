@@ -1,18 +1,22 @@
 services:
+  # S3-compatible object storage for dev. The upstream MinIO image moved off
+  # Docker Hub (minio/minio:latest no longer resolves; quay.io is unreachable
+  # from many networks), so the stack uses moto's S3 mock, which speaks the
+  # same S3 API the backend already uses (boto3 + minio SDK). The service name
+  # and MINIO_* variables are unchanged, so app config is untouched.
   minio:
-    image: minio/minio:latest
+    image: motoserver/moto:latest
     container_name: honeywell_minio
-    command: server /data --console-address ":9001"
+    entrypoint: ["moto_server", "-H", "0.0.0.0", "-p", "9000"]
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     ports:
       - "9000:9000"
-      - "9001:9001"
     volumes:
-      - minio_data:/data
+      - minio_data:/tmp/moto
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:9000/moto-api/')\""]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -29,6 +33,25 @@ services:
       - chroma_data:/chroma/chroma
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  postgres:
+    image: postgres:16
+    container_name: honeywell_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    # Host port 5433: 5432 is commonly occupied by a native PostgreSQL service.
+    # The container still listens on 5432 internally (DATABASE_URL unchanged).
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -62,6 +85,8 @@ services:
         condition: service_healthy
       ollama:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     environment:
       MINIO_ENDPOINT: minio:9000
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER}
@@ -74,6 +99,7 @@ services:
       OLLAMA_PORT: "11434"
       OLLAMA_MODEL: llama3.2:3b
       RETRIEVAL_K: "5"
+      DATABASE_URL: ${DATABASE_URL}
       PYTHONUNBUFFERED: "1"
     ports:
       - "8000:8000"
@@ -85,4 +111,5 @@ volumes:
   minio_data:
   chroma_data:
   ollama_data:
+  postgres_data:
 

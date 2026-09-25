@@ -48,6 +48,30 @@ class Parser:
             if self._normalize(text)
         ]
 
+    def parse_raw(self, content: bytes, filename: str) -> list[tuple[int, str]]:
+        """Like parse() but preserves line breaks for structure-aware consumers
+        (e.g. rule extraction). Empty pages are dropped; nothing is normalized."""
+
+        suffix = PurePath(filename).suffix.lower()
+        if suffix not in self._SUPPORTED_EXTENSIONS:
+            supported = ", ".join(sorted(self._SUPPORTED_EXTENSIONS))
+            raise ValueError(f"Only {supported} documents are supported")
+
+        if suffix == ".pdf":
+            pages = self._parse_pdf(content)
+        elif suffix in {".txt", ".md"}:
+            pages = [(1, self._decode_text(content))]
+        elif suffix == ".docx":
+            pages = self._parse_docx(content)
+        else:
+            pages = [(1, self._parse_doc(content))]
+
+        return [
+            (page_number, text.strip("\n "))
+            for page_number, text in pages
+            if text.strip()
+        ]
+
     @staticmethod
     def _parse_pdf(content: bytes) -> list[tuple[int, str]]:
         return [
@@ -61,10 +85,26 @@ class Parser:
         pages: list[str] = []
         current_page: list[str] = []
 
+        list_counter = 0
         for block in document.element.body.iterchildren():
             if block.tag.endswith("}p"):
                 paragraph = Paragraph(block, document)
-                current_page.append(paragraph.text)
+                style_name = ""
+                try:
+                    style_name = (paragraph.style.name or "").lower()
+                except (AttributeError, ValueError):
+                    style_name = ""
+                text = paragraph.text
+                # Preserve list structure: style-based numbering/bullets carry
+                # no literal markers in paragraph text, so inject them.
+                if "list number" in style_name or style_name.startswith("number"):
+                    list_counter += 1
+                    text = f"{list_counter}. {text}"
+                elif "list bullet" in style_name or style_name.startswith("bullet"):
+                    text = f"- {text}"
+                else:
+                    list_counter = 0
+                current_page.append(text)
                 if any(
                     break_element.get("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}type")
                     == "page"

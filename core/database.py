@@ -23,23 +23,34 @@ db_url = settings.database_url
 if db_url.startswith("postgresql://"):
     db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
-engine = create_async_engine(
-    db_url,
-    echo=False,
-    future=True,
-)
+try:
+    engine = create_async_engine(
+        db_url,
+        echo=False,
+        future=True,
+    )
 
-AsyncSessionLocal = async_sessionmaker(
-    bind=engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-    autocommit=False,
-    autoflush=False,
-)
+    AsyncSessionLocal = async_sessionmaker(
+        bind=engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+        autocommit=False,
+        autoflush=False,
+    )
+except Exception as exc:  # missing driver (asyncpg/aiosqlite) in lightweight envs
+    logger.warning("Database engine unavailable (%s); DB endpoints will return 503.", exc)
+    engine = None
+    AsyncSessionLocal = None
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """FastAPI dependency yielding an async database session."""
+    if AsyncSessionLocal is None:
+        raise RuntimeError(
+            "Database is unavailable in this environment "
+            "(missing asyncpg/aiosqlite driver or DATABASE_URL unreachable). "
+            "The frontend runs in Demo Mode without a database."
+        )
     async with AsyncSessionLocal() as session:
         try:
             yield session

@@ -165,3 +165,34 @@ class RuleListResponse(BaseModel):
     total: int
     rules: list[RuleResponse]
 
+
+class EvaluateProfileRequest(BaseModel):
+    jurisdiction: str = Field(..., description="Target market jurisdiction.")
+    product_type: Optional[str] = Field(
+        None, description="Offered product type e.g. 'leveraged_derivatives'."
+    )
+    capital_available_usd: Optional[float] = Field(
+        None, description="Available paid-up capital in USD (null -> UNKNOWN)."
+    )
+    leverage_offered: Optional[str] = Field(
+        None, description="Offered retail leverage ratio e.g. '1:20'."
+    )
+    has_local_presence: Optional[bool] = Field(
+        None, description="Whether a local presence is established."
+    )
+
+
+class EvaluationResultItem(BaseModel):
+    rule_id: str
+    rule_version: int = 1
+    topic: str = "general"
+    status: Literal["PASS", "CONFLICT", "UNKNOWN"]
+    reason: str = ""
+    supporting_quote: str = ""
+
+
+class EvaluateProfileResponse(BaseModel):
+    jurisdiction: str
+    total: int
+    results: list[EvaluationResultItem]
+

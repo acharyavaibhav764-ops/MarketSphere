@@ -1,8 +1,19 @@
 from typing import Any, Union
 
-from docling.chunking import HybridChunker
-from docling_core.types.doc import DoclingDocument
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+try:
+    from docling.chunking import HybridChunker
+    from docling_core.types.doc import DoclingDocument
+
+    _DOCLING_AVAILABLE = True
+except ImportError:  # lightweight envs without docling installed
+    HybridChunker = None  # type: ignore[assignment,misc]
+    DoclingDocument = None  # type: ignore[assignment,misc]
+    _DOCLING_AVAILABLE = False
+
+try:
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
+except ImportError:  # fallback: naive splitter when langchain is unavailable
+    RecursiveCharacterTextSplitter = None  # type: ignore[assignment,misc]
 
 from config import settings
 
@@ -38,11 +49,14 @@ class Chunker:
         self.chunk_size = chunk_size or settings.chunk_size
         self.chunk_overlap = chunk_overlap or settings.chunk_overlap
         self.separators = separators or ["\n\n", "\n", ". ", " ", ""]
-        self.splitter = RecursiveCharacterTextSplitter(
-            chunk_size=self.chunk_size,
-            chunk_overlap=self.chunk_overlap,
-            separators=self.separators,
-        )
+        if RecursiveCharacterTextSplitter is not None:
+            self.splitter = RecursiveCharacterTextSplitter(
+                chunk_size=self.chunk_size,
+                chunk_overlap=self.chunk_overlap,
+                separators=self.separators,
+            )
+        else:
+            self.splitter = None
 
     # ------------------------------------------------------------------
     # Public API
@@ -50,7 +64,7 @@ class Chunker:
 
     def split(
         self,
-        pages_or_doc: Union[list[tuple[int, str]], DoclingDocument],
+        pages_or_doc: Union[list[tuple[int, str]], Any],
         file_id: str,
         filename: str,
     ) -> tuple[list[str], list[dict[str, Any]], list[str]]:
@@ -78,7 +92,11 @@ class Chunker:
         Raises:
             ValueError: If the input contains no extractable text.
         """
-        if isinstance(pages_or_doc, DoclingDocument):
+        if (
+            _DOCLING_AVAILABLE
+            and DoclingDocument is not None
+            and isinstance(pages_or_doc, DoclingDocument)
+        ):
             return self._split_docling(pages_or_doc, file_id, filename)
         return self._split_legacy(pages_or_doc, file_id, filename)
 
@@ -109,8 +127,21 @@ class Chunker:
         chunks: list[str] = []
         metadatas: list[dict[str, Any]] = []
 
+        def _naive_chunks(text: str) -> list[str]:
+            step = max(1, self.chunk_size - self.chunk_overlap)
+            return [
+                text[i : i + self.chunk_size]
+                for i in range(0, len(text), step)
+                if text[i : i + self.chunk_size].strip()
+            ]
+
         for page_number, page_text in pages:
-            for chunk in self.splitter.split_text(page_text):
+            split_texts = (
+                self.splitter.split_text(page_text)
+                if self.splitter is not None
+                else _naive_chunks(page_text or "")
+            )
+            for chunk in split_texts:
                 if len(chunk) < 5:  # Skip micro chunks
                     continue
 
@@ -134,7 +165,7 @@ class Chunker:
 
     def _split_docling(
         self,
-        doc: DoclingDocument,
+        doc: object,
         file_id: str,
         filename: str,
     ) -> tuple[list[str], list[dict[str, Any]], list[str]]:

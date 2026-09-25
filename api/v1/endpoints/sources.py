@@ -10,6 +10,7 @@ These endpoints do NOT touch the existing /documents ingestion pipeline.
 All database and MinIO operations are delegated to services/source_service.py.
 """
 import logging
+from typing import Optional
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 from sqlalchemy import select

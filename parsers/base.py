@@ -1,6 +1,10 @@
 from abc import ABC, abstractmethod
+from typing import Any
 
-from docling_core.types.doc import DoclingDocument
+try:
+    from docling_core.types.doc import DoclingDocument
+except ImportError:  # lightweight envs (tests / frontend-only dev)
+    DoclingDocument = Any  # type: ignore[assignment,misc]
 
 
 class BaseParser(ABC):

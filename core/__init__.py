@@ -1,6 +1,11 @@
 from .chunker import Chunker
 from .parser import Parser
-from parsers import ParserRouter, DoclingParser
+
+try:
+    from parsers import ParserRouter, DoclingParser
+except ImportError:
+    ParserRouter = None  # type: ignore[assignment,misc]
+    DoclingParser = None  # type: ignore[assignment,misc]
 
 # Heavy infrastructure imports (boto3, chromadb, httpx) are deferred to avoid
 # import failures in test environments that only have the parsing dependencies.
