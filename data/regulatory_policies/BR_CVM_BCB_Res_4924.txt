@@ -1,0 +1,14 @@
+COMISSÃO DE VALORES MOBILIÁRIOS (CVM) & BANCO CENTRAL DO BRASIL (BCB)
+CVM Deliberação 818 & BCB Resolução No. 4.924 / 2023
+
+SECTION 1: RETAIL MARGIN TRADING LEVERAGE LIMITS
+Retail customer margin leverage shall not exceed ratio of 1:20 across all registered instruments and currency contracts.
+Brokers offering foreign exchange margin or derivative trading must enforce automatic liquidation when margin coverage falls below 50 percent.
+
+SECTION 2: STATUTORY CAPITAL RESERVE
+Entities operating as virtual asset service providers or derivative dealers must maintain capital reserve of BRL 3,000,000 (USD ~600,000).
+Capital reserves must be held in Brazilian government bonds or liquid central bank deposits.
+
+SECTION 3: LOCAL ENTITY AND RESIDENT REPRESENTATIVE
+Foreign broker-dealers must establish a registered Brazilian subsidiary (CNPJ) and designate a legally responsible resident representative.
+Brokers directly soliciting Brazilian residents without CVM accreditation are subject to daily administrative fines.

@@ -1,0 +1,14 @@
+FINANCIAL SERVICES AGENCY (JFSA) — JAPAN
+Cabinet Office Ordinance on Financial Instruments Business (Ordinance No. 52 of 2007)
+
+SECTION 1: RETAIL FX LEVERAGE CAP (ARTICLE 117)
+Margin trading for retail individual customers on foreign exchange transactions is strictly capped at a leverage ratio of 1:25 (4 percent margin).
+For cryptocurrency asset margin transactions, retail leverage is capped at 1:2 pursuant to the 2020 Payment Services Act revisions.
+
+SECTION 2: MINIMUM NET ASSETS REQUIREMENTS
+Type I Financial Instruments Business Operators must maintain minimum net assets of JPY 50,000,000 and capital adequacy ratio of at least 120 percent.
+If the capital adequacy ratio drops below 120 percent, the operator must immediately report to the Director-General of the Local Finance Bureau.
+
+SECTION 3: CLIENT ASSET TRUST PRESERVATION
+Brokers must maintain full segregation of customer trust assets with a domestic Japanese trust bank.
+Co-mingling of broker proprietary funds with customer margin deposits is strictly prohibited.

@@ -1,0 +1,14 @@
+DUBAI VIRTUAL ASSETS REGULATORY AUTHORITY (VARA)
+Virtual Assets and Related Activities Regulations 2023 — Market Conduct Rulebook
+
+SECTION 1: RETAIL DERIVATIVE LEVERAGE CAP
+Retail leverage is strictly capped at 1:5 for virtual asset derivatives and margin contracts.
+Brokers are prohibited from offering margin lending to retail customers exceeding this statutory ceiling.
+
+SECTION 2: MINIMUM CAPITALIZATION MANDATES
+Licensees offering broker-dealer services must maintain paid-up statutory capital of not less than USD 500,000 (AED 1,835,000).
+Capital reserves must be held in liquid form and unencumbered by third-party liens.
+
+SECTION 3: DUBAI COMMERCIAL PRESENCE
+Licensees must maintain registered office and permanent resident senior management in the Emirate of Dubai.
+At least two senior executive officers must be permanently resident within the UAE.

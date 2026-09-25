@@ -1,0 +1,14 @@
+BUNDESANSTALT FÜR FINANZDIENSTLEISTUNGSAUFSICHT (BAFIN) — GERMANY
+Wertpapierinstitutsgesetz (WpIG) & Allgemeinverfügung zu Verträgen über Differenzen (CFDs)
+
+SECTION 1: MANDATORY LEVERAGE RATIOS FOR CFDs
+Marketing, distribution and sale of contracts for difference to retail clients is restricted to maximum leverage of 1:30 for major forex pairs and 1:20 for minor forex.
+Retail client leverage for commodities (other than gold) is restricted to 1:10; crypto assets to 1:2.
+
+SECTION 2: REGULATORY CAPITAL FOR WERTPAPIERINSTITUTE
+Medium and large investment firms under the German WpIG must hold minimum initial regulatory capital of EUR 750,000.
+Firms operating as multilateral trading facilities or dealing on own account are subject to regular BaFin capital adequacy audits.
+
+SECTION 3: MANDATORY EXCLUSION OF ADDITIONAL PAYMENT OBLIGATIONS (NACHSCHUSSPFLICHT)
+Issuers must exclude retail client payment obligations beyond deposited capital (mandatory negative balance protection without exception).
+Any contract for difference with margin call replenishment obligation is illegal for retail marketing in Germany.

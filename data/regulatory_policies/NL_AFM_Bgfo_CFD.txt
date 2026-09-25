@@ -1,0 +1,14 @@
+AUTORITEIT FINANCIËLE MARKTEN (AFM) — NETHERLANDS
+Wet op het financieel toezicht (Wft) & Beleidsregel CFD
+
+SECTION 1: LEVERAGE LIMITS ON RETAIL CFDs
+The offering of CFDs to non-professional clients is subject to leverage caps of 1:30 for major currencies and 1:20 for non-major currencies.
+Positions on commodities (other than gold) are restricted to 1:10; equity CFDs to 1:5; crypto CFDs to 1:2.
+
+SECTION 2: INITIAL PRUDENTIAL CAPITAL
+Investment firms holding client money and trading on own account must maintain initial capital of at least EUR 750,000.
+Firms must continuously satisfy own funds requirements set by De Nederlandsche Bank (DNB) and AFM.
+
+SECTION 3: PROHIBITION OF TRADING INCENTIVES
+CFD providers are prohibited from offering bonuses or financial incentives to attract retail clients.
+Standardized risk disclosures and automated 50 percent margin liquidation triggers are mandatory.

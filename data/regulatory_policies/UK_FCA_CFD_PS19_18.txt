@@ -1,0 +1,14 @@
+FINANCIAL CONDUCT AUTHORITY (FCA) — UNITED KINGDOM
+Policy Statement PS19/18 & Conduct of Business Sourcebook (COBS 22.5)
+
+SECTION 1: PERMANENT RETAIL LEVERAGE CAPS
+Firms selling CFDs to retail clients must restrict retail leverage to 1:30 for major currency pairs and 1:20 for non-major currency pairs.
+Minor indices and commodities other than gold are restricted to 1:10; individual equities to 1:5; crypto-asset derivatives are prohibited for retail distribution under PS20/10.
+
+SECTION 2: INITIAL REGULATORY CAPITAL REQUIREMENTS
+Investment firms authorized under UK MiFID must hold initial capital of at least EUR 750,000 (or equivalent in GBP).
+Firms operating an organized trading facility or dealing on own account must maintain adequate Tier 1 capital pursuant to the UK Investment Firms Prudential Regime (IFPR).
+
+SECTION 3: MANDATORY RETAIL PROTECTIONS
+Mandatory negative balance protection ensures retail clients cannot lose more than total account equity.
+Firms must enforce a 50 percent margin close-out rule across all retail client CFD accounts.

@@ -6,7 +6,8 @@ from .base import BaseParser
 from .docling_parser import DoclingParser
 from .libreoffice_converter import LibreOfficeConverter
 from .text import TextParser
-from .pdf_stub import PdfStubParser
+from .pdf_stub import PdfStubParser  # v4 stub — kept for legacy reference; no longer registered
+from .pdf_page_router import PdfPageRouter  # v5 per-page triage (replaces PdfStubParser)
 
 
 class UnsupportedFileError(ValueError):
@@ -43,8 +44,10 @@ class ParserRouter:
         self.register(DoclingParser())
         # v3: register LibreOfficeConverter for .doc / .ppt
         self.register(LibreOfficeConverter())
-        # v4: register PdfStubParser for .pdf
-        self.register(PdfStubParser())
+        # v4: register PdfStubParser for .pdf (now superseded by v5)
+        # self.register(PdfStubParser())  # kept for reference — do not re-enable
+        # v5: register PdfPageRouter — per-page triage (PyMuPDF4LLM / Docling / DeepSeek-OCR2)
+        self.register(PdfPageRouter())
 
     # ------------------------------------------------------------------
     # Public API

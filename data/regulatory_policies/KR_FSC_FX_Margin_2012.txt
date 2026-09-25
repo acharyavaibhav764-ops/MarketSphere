@@ -1,0 +1,14 @@
+FINANCIAL SERVICES COMMISSION (FSC) & FINANCIAL SUPERVISORY SERVICE (FSS) — SOUTH KOREA
+Financial Investment Services and Capital Markets Act (FSCMA)
+
+SECTION 1: STRICT RETAIL FX MARGIN TRADING LEVERAGE CAP
+Retail FX margin trading leverage is strictly capped at 1:10 (10 percent margin requirement) for individual retail investors.
+Under the 2012 FSC investor protection measures, the previous 1:20 leverage cap was lowered to 1:10 to suppress excessive speculative risks.
+
+SECTION 2: MINIMUM CAPITAL REQUIREMENTS FOR DERIVATIVE BROKERS
+Financial investment brokers dealing in OTC derivatives must possess minimum equity capital of KRW 3,000,000,000 (approx USD 2,300,000).
+Capital adequacy requirements require regular monitoring of net operating capital ratio (NCR).
+
+SECTION 3: SOLICITATION RESTRICTIONS ON FOREIGN BROKERS
+Offshore entities are prohibited from directly soliciting retail residents in South Korea without local FSC registration.
+Providing Korean-language trading interfaces and marketing without FSC approval violates the Capital Markets Act.

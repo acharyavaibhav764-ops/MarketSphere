@@ -1,0 +1,14 @@
+AUTORITÉ DES MARCHÉS FINANCIERS (AMF) — FRANCE
+Code monétaire et financier & Règlement général de l'AMF
+
+SECTION 1: RETAIL CFD LEVERAGE LIMITS
+Marketing and distribution of CFDs to retail clients is limited to maximum leverage of 1:30 for major exchange rates and 1:20 for other currency pairs.
+Under the Sapin II Law, digital marketing of contracts for difference with leverage exceeding 1:5 to retail investors is prohibited.
+
+SECTION 2: ACPR INVESTMENT FIRM CAPITAL
+Investment firms authorized by ACPR/AMF must maintain minimum initial capital of EUR 750,000.
+Firms dealing on own account must maintain adequate own funds calculated under EU Regulation 2019/2033 (IFR).
+
+SECTION 3: ADVERTISING AND MARKETING RESTRICTIONS
+Commercial advertising via digital channels for retail financial contracts offering leverage greater than 1:5 is prohibited under French law.
+All retail positions must incorporate negative balance protection and a 50 percent margin close-out trigger.

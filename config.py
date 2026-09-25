@@ -52,5 +52,27 @@ class Settings:
     libreoffice_binary: str = os.getenv("LIBREOFFICE_BINARY", "")
     libreoffice_timeout_seconds: int = int(os.getenv("LIBREOFFICE_TIMEOUT_SECONDS", "60"))
 
+    # Parsing Architecture v5 — PDF per-page triage (PdfPageRouter)
+    # DeepSeek-OCR2 requires ≥8 GB VRAM; disabled by default.
+    # Do NOT enable on the GTX 1650 dev machine.
+    # vLLM serving (v6) is explicitly NOT implemented — HF Transformers only.
+    enable_deepseek_ocr2: bool = (
+        os.getenv("ENABLE_DEEPSEEK_OCR2", "false").lower() == "true"
+    )
+    deepseek_model_id: str = os.getenv("DEEPSEEK_MODEL_ID", "deepseek-ai/DeepSeek-OCR-2")
+
+    # Tunable triage thresholds — calibrate against your own PDF corpus before production
+    # (see RAG_PARSING_ARCHITECTURE_FINAL.md §7 for guidance)
+    pdf_triage_text_threshold: int = int(os.getenv("PDF_TRIAGE_TEXT_THRESHOLD", "10"))
+    pdf_triage_image_ratio_threshold: float = float(
+        os.getenv("PDF_TRIAGE_IMAGE_RATIO", "0.5")
+    )
+
+    # MochaTrade regulatory source registry
+    regulatory_bucket: str = os.getenv("REGULATORY_BUCKET", "mocha-regulatory-sources")
+    database_url: str = os.getenv(
+        "DATABASE_URL", "postgresql+asyncpg://user:pass@localhost/mocha"
+    )
+
 
 settings = Settings()

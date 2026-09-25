@@ -1,0 +1,14 @@
+MONETARY AUTHORITY OF SINGAPORE (MAS)
+Notice SFA 04-N15 — Securities and Futures Act (Cap. 289)
+
+SECTION 1: RETAIL MARGIN & LEVERAGE CONSTRAINTS
+The margin requirement for retail contracts for differences (CFDs) on foreign exchange is minimum 5 percent, restricting maximum retail leverage to 1:20.
+Non-accredited retail investors cannot be provided with leverage exceeding this threshold.
+
+SECTION 2: BASE CAPITAL REQUIREMENTS
+Capital Markets Services (CMS) license holders dealing in capital markets products must maintain minimum base capital of SGD 1,000,000.
+Additionally, licensees must maintain minimum financial resources calculated under the Securities and Futures (Financial and Margin Requirements) Regulations.
+
+SECTION 3: LOCAL MANAGEMENT AND PHYSICAL PRESENCE
+Applicant must maintain local operational management presence in Singapore with at least two executive directors resident in Singapore.
+Key executive officers must hold minimum relevant capital markets experience recognized by the Authority.

@@ -1,0 +1,17 @@
+UNITED STATES COMMODITY FUTURES TRADING COMMISSION (CFTC)
+NATIONAL FUTURES ASSOCIATION (NFA) REGULATORY STANDARDS
+Title 17, Chapter I, Part 5 — Off-Exchange Retail Foreign Exchange Transactions
+
+SECTION 1: STATUTORY RETAIL LEVERAGE RESTRICTIONS
+Pursuant to CFTC Regulation 5.18(a) and NFA Financial Requirements Section 11:
+Major currency pairs retail leverage is capped at 1:50 (2 percent margin requirement).
+For all non-major currency pairs, the maximum allowable retail leverage is 1:20 (5 percent margin requirement).
+These leverage constraints are mandatory for all registered Retail Foreign Exchange Dealers (RFEDs) and Futures Commission Merchants (FCMs).
+
+SECTION 2: MINIMUM STATUTORY CAPITALIZATION FLOOR
+Retail foreign exchange dealers (RFEDs) and futures commission merchants (FCMs) must maintain adjusted net capital of not less than $20,000,000.
+Entities must maintain this capital floor plus additional reserves equal to 5 percent of all retail customer liabilities exceeding $10,000,000.
+
+SECTION 3: LOCAL OPERATIONAL PRESENCE MANDATES
+Registration as a Retail Foreign Exchange Dealer requires maintaining domestic operational office and Chief Compliance Officer in the United States.
+All books, records, and client account balances must be accessible for direct inspection by NFA and CFTC examiners.

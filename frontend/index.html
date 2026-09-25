@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MochaTrade — Regulatory Policy & Compliance Intelligence</title>
+  <meta name="description" content="AI-assisted regulatory ingestion, human review queue, and deterministic compliance evaluation engine for cross-border broker trading policies.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-logo">
+          <div class="logo-orb"></div>
+          <span class="logo-symbol">☕</span>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title-wrap">
+            <span class="brand-name">Mocha<span class="gradient-text">Trade</span></span>
+            <span class="version-tag">v5 Policy Engine</span>
+          </div>
+          <span class="brand-subtitle">Cross-Border Trading Policy Extraction &amp; Deterministic Compliance</span>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <div class="api-status-pill" id="api-status-pill">
+          <span class="status-dot" id="api-status-dot"></span>
+          <span id="api-status-text">Demo Mode (Active)</span>
+        </div>
+        <button class="settings-toggle-btn" id="settings-toggle-btn" title="API Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          API Config
+        </button>
+      </div>
+    </header>
+
+    <!-- API Config Modal / Drawer -->
+    <div class="config-modal" id="config-modal" style="display: none;">
+      <div class="config-modal-content">
+        <div class="modal-header">
+          <h3>Backend API Configuration</h3>
+          <button class="close-btn" id="config-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="api-base-url-input">API Base URL</label>
+            <input type="text" id="api-base-url-input" value="http://localhost:8000/api/v1" placeholder="http://localhost:8000/api/v1">
+            <span class="field-hint">Points to MarketSphere FastAPI server (v1 router).</span>
+          </div>
+          <div class="form-group">
+            <label for="api-mode-select">Execution Mode</label>
+            <select id="api-mode-select">
+              <option value="demo">Demo / Mock Mode (Pre-populated VARA, BCB, OJK data)</option>
+              <option value="live">Live Backend Server (Connects via HTTP)</option>
+            </select>
+          </div>
+          <div class="modal-actions">
+            <button class="btn btn-secondary" id="test-connection-btn">Ping Server</button>
+            <button class="btn btn-primary" id="save-config-btn">Save Settings</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" id="main-nav-tabs">
+      <button class="nav-tab active" data-tab="tab-evaluator" id="tab-btn-evaluator">
+        <span class="tab-icon">⚡</span>
+        <span class="tab-label">Compliance Evaluator</span>
+        <span class="tab-chip">Phase 5</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-review" id="tab-btn-review">
+        <span class="tab-icon">⚖️</span>
+        <span class="tab-label">Human Review Queue</span>
+        <span class="tab-chip" id="queue-badge-count">3 Drafts</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-sources" id="tab-btn-sources">
+        <span class="tab-icon">📥</span>
+        <span class="tab-label">Source Ingestion</span>
+        <span class="tab-chip">Phase 1 &amp; 2</span>
+      </button>
+      <button class="nav-tab" data-tab="tab-architecture" id="tab-btn-architecture">
+        <span class="tab-icon">🏛️</span>
+        <span class="tab-label">Architecture &amp; Provenance</span>
+      </button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="content-container">
+
+      <!-- ======================================================== -->
+      <!-- TAB 1: DETERMINISTIC COMPLIANCE EVALUATOR               -->
+      <!-- ======================================================== -->
+      <section class="tab-panel active" id="tab-evaluator">
+        <div class="panel-layout">
+          <!-- Left Column: Product & Broker Form -->
+          <div class="panel-card form-column">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="card-badge">Deterministic Engine</span>
+                <h2>Broker Product Specification</h2>
+              </div>
+              <p class="card-desc">Evaluate your trading offering against active approved statutory rules. Missing facts evaluate strictly to <span class="badge badge-warning">UNKNOWN</span>.</p>
+            </div>
+
+            <form id="evaluator-form" class="evaluator-form">
+              <div class="form-group">
+                <label for="eval-jurisdiction">Target Market Jurisdiction *</label>
+                <select id="eval-jurisdiction" class="form-select" required>
+                  <option value="United States">United States (CFTC / NFA)</option>
+                  <option value="United Kingdom">United Kingdom (FCA)</option>
+                  <option value="Singapore">Singapore (MAS)</option>
+                  <option value="Australia">Australia (ASIC)</option>
+                  <option value="Switzerland">Switzerland (FINMA)</option>
+                  <option value="Hong Kong">Hong Kong (SFC)</option>
+                  <option value="Japan">Japan (JFSA)</option>
+                  <option value="India">India (RBI / SEBI)</option>
+                  <option value="United Arab Emirates" selected>United Arab Emirates (VARA)</option>
+                  <option value="Canada">Canada (CIRO / IIROC)</option>
+                  <option value="France">France (AMF / ACPR)</option>
+                  <option value="Germany">Germany (BaFin)</option>
+                  <option value="Netherlands">Netherlands (AFM)</option>
+                  <option value="South Korea">South Korea (FSC / FSS)</option>
+                  <option value="Brazil">Brazil (CVM / BCB)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="eval-product-type">Offered Product Type *</label>
+                <select id="eval-product-type" class="form-select" required>
+                  <option value="leveraged_derivatives">Leveraged Crypto Derivatives</option>
+                  <option value="spot_trading">Spot Asset Exchange</option>
+                  <option value="margin_cfd">Margin FX / CFD Contracts</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <div class="label-with-actions">
+                  <label for="eval-capital">Available Paid-Up Capital (USD)</label>
+                  <div class="quick-presets">
+                    <button type="button" class="preset-btn" data-capital="150000">$150K</button>
+                    <button type="button" class="preset-btn" data-capital="500000">$500K</button>
+                    <button type="button" class="preset-btn" data-capital="2000000">$2M</button>
+                  </div>
+                </div>
+                <div class="input-with-symbol">
+                  <span class="symbol">$</span>
+                  <input type="number" id="eval-capital" placeholder="500000" min="0" step="50000" value="500000">
+                </div>
+                <span class="field-hint">Tests statutory floor [TOPSIS Criterion C6]. Leave empty to test UNKNOWN flag.</span>
+              </div>
+
+              <div class="form-group">
+                <div class="label-with-actions">
+                  <label for="eval-leverage">Retail Leverage Ratio Offered</label>
+                  <div class="quick-presets">
+                    <button type="button" class="preset-btn" data-leverage="1:5">1:5</button>
+                    <button type="button" class="preset-btn" data-leverage="1:20">1:20</button>
+                    <button type="button" class="preset-btn" data-leverage="1:100">1:100</button>
+                  </div>
+                </div>
+                <input type="text" id="eval-leverage" placeholder="1:20" value="1:20">
+                <span class="field-hint">Format e.g. '1:5', '1:20', '1:100'. Evaluated against statutory retail caps [TOPSIS C4].</span>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-glow" id="btn-run-eval">
+                  <span class="btn-icon">⚡</span>
+                  Run Compliance Evaluation
+                </button>
+                <button type="button" class="btn btn-outline" id="btn-clear-eval">Reset</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Right Column: Evaluation Results -->
+          <div class="panel-card results-column">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="card-badge" id="eval-verdict-badge">Ready</span>
+                <h2>Evaluation Verdict &amp; Audit Citations</h2>
+              </div>
+              <p class="card-desc">Deterministic rule-by-rule verdict with exact legal citations. Zero LLM hallucinations in the decision path.</p>
+            </div>
+
+            <!-- Summary Banner -->
+            <div class="verdict-banner" id="verdict-banner">
+              <div class="verdict-status-icon" id="verdict-status-icon">⚖️</div>
+              <div class="verdict-details">
+                <h3 id="verdict-title">No Evaluation Run Yet</h3>
+                <p id="verdict-summary">Select a jurisdiction and parameters on the left, then click <strong>Run Compliance Evaluation</strong>.</p>
+              </div>
+            </div>
+
+            <!-- Individual Rule Results List -->
+            <div class="rule-results-container">
+              <h4 class="section-subhead">Applicable Approved Rules &amp; Breakdown</h4>
+              <div class="rule-cards-list" id="eval-rule-cards-list">
+                <div class="empty-state">
+                  <p>Awaiting profile input...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 2: HUMAN REVIEW QUEUE & RULE STORE                  -->
+      <!-- ======================================================== -->
+      <section class="tab-panel" id="tab-review">
+        <div class="review-panel-layout">
+          <!-- Filter Controls -->
+          <div class="filter-bar">
+            <div class="filter-group">
+              <label>Status Filter:</label>
+              <div class="btn-toggle-group" id="review-status-filter">
+                <button class="toggle-btn active" data-status="all">All</button>
+                <button class="toggle-btn" data-status="draft">Draft (3)</button>
+                <button class="toggle-btn" data-status="approved">Approved (4)</button>
+                <button class="toggle-btn" data-status="rejected">Rejected (0)</button>
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <label for="review-jurisdiction-filter">Market:</label>
+              <select id="review-jurisdiction-filter" class="form-select-sm">
+                <option value="all">All Jurisdictions (15 Markets)</option>
+                <option value="United States">United States (CFTC / NFA)</option>
+                <option value="United Kingdom">United Kingdom (FCA)</option>
+                <option value="Singapore">Singapore (MAS)</option>
+                <option value="Australia">Australia (ASIC)</option>
+                <option value="Switzerland">Switzerland (FINMA)</option>
+                <option value="Hong Kong">Hong Kong (SFC)</option>
+                <option value="Japan">Japan (JFSA)</option>
+                <option value="India">India (RBI / SEBI)</option>
+                <option value="United Arab Emirates">United Arab Emirates (VARA)</option>
+                <option value="Canada">Canada (CIRO / IIROC)</option>
+                <option value="France">France (AMF / ACPR)</option>
+                <option value="Germany">Germany (BaFin)</option>
+                <option value="Netherlands">Netherlands (AFM)</option>
+                <option value="South Korea">South Korea (FSC / FSS)</option>
+                <option value="Brazil">Brazil (CVM / BCB)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Master-Detail Review Split View -->
+          <div class="review-split-view">
+            <!-- Left: Rule Cards List -->
+            <div class="review-list-col">
+              <div class="list-header">
+                <h3>Extracted Rule Candidates</h3>
+                <span class="count-tag" id="review-rule-count">7 Total</span>
+              </div>
+              <div class="rule-queue-scroll" id="rule-queue-list">
+                <!-- Injected via JavaScript -->
+              </div>
+            </div>
+
+            <!-- Right: Inspector & Verification Panel -->
+            <div class="review-inspector-col" id="review-inspector">
+              <div class="empty-state">
+                <p>Select a candidate rule from the list on the left to verify citation evidence and take action.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 3: SOURCE INGESTION (PHASE 1 & 2)                    -->
+      <!-- ======================================================== -->
+      <section class="tab-panel" id="tab-sources">
+        <div class="panel-layout">
+          <!-- Left: Ingestion Form -->
+          <div class="panel-card form-column">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="card-badge">Source Registry</span>
+                <h2>Upload Regulatory Document</h2>
+              </div>
+              <p class="card-desc">Ingests official policy documents into MinIO, computes deterministic SHA-256 for deduplication, and prepares them for the v5 per-page parser.</p>
+            </div>
+
+            <form id="source-ingest-form" class="source-form">
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="source-jurisdiction">Jurisdiction *</label>
+                  <input type="text" id="source-jurisdiction" placeholder="e.g. UAE" required value="UAE">
+                </div>
+                <div class="form-group flex-1">
+                  <label for="source-regulator">Regulator *</label>
+                  <input type="text" id="source-regulator" placeholder="e.g. VARA" required value="VARA">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="source-title">Official Document Title *</label>
+                <input type="text" id="source-title" placeholder="e.g. VARA Virtual Assets Market Conduct Rulebook 2024" required value="VARA Virtual Assets Market Conduct Rulebook 2024">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group flex-1">
+                  <label for="source-type">Source Type *</label>
+                  <select id="source-type" class="form-select">
+                    <option value="PDF">PDF Document (.pdf)</option>
+                    <option value="DOCX">Word Document (.docx)</option>
+                    <option value="HTML">Web/HTML Source (.html)</option>
+                  </select>
+                </div>
+                <div class="form-group flex-1">
+                  <label for="source-instrument">Instrument Type</label>
+                  <select id="source-instrument" class="form-select">
+                    <option value="Rulebook">Rulebook</option>
+                    <option value="Act">Statutory Act</option>
+                    <option value="Circular">Regulatory Circular</option>
+                    <option value="Guidance">Official Guidance</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="source-url">Regulator Canonical URL</label>
+                <input type="url" id="source-url" placeholder="https://www.vara.ae/en/regulations/rulebooks/" value="https://www.vara.ae/en/regulations/rulebooks/">
+              </div>
+
+              <!-- Drag and drop zone -->
+              <div class="form-group">
+                <label>Document File *</label>
+                <div class="file-dropzone" id="file-dropzone">
+                  <input type="file" id="source-file-input" class="file-input-hidden" accept=".pdf,.docx,.html,.txt">
+                  <div class="dropzone-content">
+                    <span class="dropzone-icon">📄</span>
+                    <p class="dropzone-main-text">Drag &amp; drop policy document, or <span class="browse-link">browse</span></p>
+                    <span class="dropzone-hint">Supports PDF, DOCX, HTML (Max 50MB)</span>
+                  </div>
+                  <div class="file-preview-card" id="file-preview-card" style="display: none;">
+                    <div class="file-info">
+                      <span class="file-name" id="preview-filename">document.pdf</span>
+                      <span class="file-hash" id="preview-hash">Computing SHA-256...</span>
+                    </div>
+                    <button type="button" class="remove-file-btn" id="remove-file-btn">&times;</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="btn-submit-source">
+                  <span>Register Source &amp; Ingest</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Right: Ingested Sources Ledger -->
+          <div class="panel-card results-column">
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="card-badge">Provenance Ledger</span>
+                <h2>Registered Legal Sources</h2>
+              </div>
+              <p class="card-desc">All immutable source records stored in the PostgreSQL registry and preserved in MinIO.</p>
+            </div>
+
+            <div class="source-list" id="source-registry-list">
+              <!-- Rendered via JavaScript -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================== -->
+      <!-- TAB 4: ARCHITECTURE & PROVENANCE WORKFLOW               -->
+      <!-- ======================================================== -->
+      <section class="tab-panel" id="tab-architecture">
+        <div class="arch-container">
+          <div class="arch-hero">
+            <h2>MochaTrade 5-Phase End-to-End Compliance Pipeline</h2>
+            <p>From unstructured official legal gazettes to deterministic broker validation and TOPSIS MCDM market ranking.</p>
+          </div>
+
+          <div class="pipeline-flow">
+            <!-- Step 1 -->
+            <div class="flow-card">
+              <div class="flow-step-num">01</div>
+              <div class="flow-icon">📥</div>
+              <h3>Source Ingestion</h3>
+              <p>Preserves raw bytes in MinIO, computes deterministic SHA-256 hash, and deduplicates against the source registry.</p>
+              <div class="flow-tech-tags">
+                <span>SHA-256</span>
+                <span>MinIO S3</span>
+                <span>SQLAlchemy</span>
+              </div>
+            </div>
+
+            <div class="flow-connector">➔</div>
+
+            <!-- Step 2 -->
+            <div class="flow-card">
+              <div class="flow-step-num">02</div>
+              <div class="flow-icon">📑</div>
+              <h3>v5 Per-Page Router</h3>
+              <p>PyMuPDF fast triage routes clean pages to PyMuPDF4LLM, tables to Docling, and scans to DeepSeek-OCR2 (HF Transformers).</p>
+              <div class="flow-tech-tags">
+                <span>PyMuPDF</span>
+                <span>Docling</span>
+                <span>DeepSeek-OCR2</span>
+              </div>
+            </div>
+
+            <div class="flow-connector">➔</div>
+
+            <!-- Step 3 -->
+            <div class="flow-card">
+              <div class="flow-step-num">03</div>
+              <div class="flow-icon">🤖</div>
+              <h3>AI Extraction &amp; Judge</h3>
+              <p>LLM extracts candidate rules, LLM-as-a-judge adds <code>evidence_tag</code>, and a deterministic verbatim check discards hallucinated quotes.</p>
+              <div class="flow-tech-tags">
+                <span>Verbatim Guard</span>
+                <span>LLM Judge</span>
+                <span>Pydantic v2</span>
+              </div>
+            </div>
+
+            <div class="flow-connector">➔</div>
+
+            <!-- Step 4 -->
+            <div class="flow-card">
+              <div class="flow-step-num">04</div>
+              <div class="flow-icon">⚖️</div>
+              <h3>Human Review Gate</h3>
+              <p>Compliance officer approves, rejects, or edits rules. Only approved rules are committed to the queryable rule store.</p>
+              <div class="flow-tech-tags">
+                <span>Versioned Rules</span>
+                <span>Audit Trail</span>
+                <span>FastAPI</span>
+              </div>
+            </div>
+
+            <div class="flow-connector">➔</div>
+
+            <!-- Step 5 -->
+            <div class="flow-card">
+              <div class="flow-step-num">05</div>
+              <div class="flow-icon">⚡</div>
+              <h3>Deterministic Evaluator</h3>
+              <p>Evaluates broker profiles against approved rules without LLMs in the hot path. Returns PASS, CONFLICT, or UNKNOWN with citations.</p>
+              <div class="flow-tech-tags">
+                <span>100% Deterministic</span>
+                <span>Zero Hallucination</span>
+                <span>TOPSIS C4 &amp; C6</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- TOPSIS Integration preview box -->
+          <div class="topsis-preview-box">
+            <div class="topsis-badge">Downstream Integration</div>
+            <h3>TOPSIS MCDM Market Ranking Matrix Feed</h3>
+            <p>Approved rules feed directly into the TOPSIS Multi-Criteria Decision Making matrix with Evidence-Calibrated Monte Carlo noise (SMAA):</p>
+            <div class="topsis-features-grid">
+              <div class="topsis-item">
+                <span class="topsis-code">C4: Retail Leverage</span>
+                <p>Denormalized <code>leverage_cap</code> feeds criterion C4.</p>
+              </div>
+              <div class="topsis-item">
+                <span class="topsis-code">C6: Capital Knockout</span>
+                <p><code>required_capital</code> executes hard knockout if startup runway &lt; requirement.</p>
+              </div>
+              <div class="topsis-item">
+                <span class="topsis-code">C7: Presence Friction</span>
+                <p><code>presence_friction_summary</code> assesses local resident director / office mandates.</p>
+              </div>
+              <div class="topsis-item">
+                <span class="topsis-code">SMAA Engine</span>
+                <p><code>evidence_tag</code> configures Monte Carlo variance (tight Gaussian for Verified Fact, wider for Analyst Estimate).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Edit Rule Modal -->
+    <div class="config-modal" id="edit-rule-modal" style="display: none;">
+      <div class="config-modal-content">
+        <div class="modal-header">
+          <h3>Edit Rule &amp; Increment Version</h3>
+          <button class="close-btn" id="edit-rule-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <form id="edit-rule-form">
+            <input type="hidden" id="edit-rule-id">
+            <div class="form-group">
+              <label for="edit-rule-topic">Topic</label>
+              <input type="text" id="edit-rule-topic" required>
+            </div>
+            <div class="form-group">
+              <label for="edit-rule-obligation">Obligation / Restriction</label>
+              <textarea id="edit-rule-obligation" rows="3" required></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="edit-rule-leverage">Retail Leverage Cap</label>
+                <input type="text" id="edit-rule-leverage" placeholder="1:5">
+              </div>
+              <div class="form-group flex-1">
+                <label for="edit-rule-capital">Required Capital (USD)</label>
+                <input type="number" id="edit-rule-capital" placeholder="500000">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="edit-rule-evidence">Evidence Tag</label>
+              <select id="edit-rule-evidence" class="form-select">
+                <option value="Verified Fact">Verified Fact</option>
+                <option value="Analyst Estimate">Analyst Estimate</option>
+                <option value="Unresolved Policy / Draft">Unresolved Policy / Draft</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="edit-rule-reviewer">Reviewer ID / Signature *</label>
+              <input type="text" id="edit-rule-reviewer" value="compliance-officer@mochatrade.io" required>
+            </div>
+            <div class="modal-actions">
+              <button type="button" class="btn btn-secondary" id="edit-rule-cancel-btn">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save &amp; Approve Version</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast" id="toast" style="display: none;"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

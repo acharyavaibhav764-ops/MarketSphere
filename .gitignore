@@ -30,7 +30,9 @@ venv.bak/
 chroma_data/
 minio_data/
 ollama_data/
-data/
+data/*
+!data/regulatory_policies/
+!data/extracted_15_countries_rules.json
 storage/
 uploads/
 
@@ -39,7 +41,9 @@ uploads/
 # ==============================================================================
 .cache/
 cache/
-models/
+# ML model weights (keep Python models/ package tracked)
+!models/
+!models/**
 huggingface/
 .huggingface/
 docling_models/

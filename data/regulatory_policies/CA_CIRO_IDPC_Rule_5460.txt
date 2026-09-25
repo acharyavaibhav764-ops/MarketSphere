@@ -1,0 +1,14 @@
+CANADIAN INVESTMENT REGULATORY ORGANIZATION (CIRO)
+Investment Dealer and Partially Consolidated (IDPC) Rules — Section 5460
+
+SECTION 1: FOREIGN EXCHANGE MARGIN SCHEDULES
+Dealer members must require retail clients to post spot risk margin of at least 3.33 percent for Group 1 major currencies, restricting leverage to 1:30.
+For Group 2 and volatile currencies, minimum margin is 5 percent to 10 percent (maximum leverage 1:20 to 1:10).
+
+SECTION 2: MINIMUM REGULATORY CAPITAL
+Investment dealers must maintain minimum regulatory capital of CAD 1,000,000 (Tier 1 dealer) or CAD 250,000.
+Dealer members dealing with public retail customers must participate in the Canadian Investor Protection Fund (CIPF).
+
+SECTION 3: REGISTERED CANADIAN ENTITY REQUIREMENT
+Retail foreign exchange accounts must be administered through a registered Canadian entity subject to CIPF investor protection.
+Direct cross-border servicing of Canadian retail accounts without provincial securities commission registration is prohibited.

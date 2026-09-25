@@ -1,0 +1,15 @@
+AUSTRALIAN SECURITIES AND INVESTMENTS COMMISSION (ASIC)
+Corporations Act 2001 — Section 1023D
+Product Intervention Order (Instrument 2020/986)
+
+SECTION 1: LEVERAGE RESTRICTIONS
+CFD issuers are prohibited from giving retail clients leverage exceeding 1:30 for major currency pairs and 1:20 for minor currency pairs.
+Maximum retail leverage for commodities (excluding gold) is 1:10; crypto-assets are capped at 1:2.
+
+SECTION 2: SURPLUS LIQUID FUNDS & CAPITAL
+Australian Financial Services Licensee (AFSL) dealing in OTC derivatives must maintain minimum surplus liquid funds of AUD 1,000,000.
+Licensees must also hold tangible net assets of at least AUD 1,000,000 or 10 percent of average revenue.
+
+SECTION 3: MANDATORY CLOSE-OUT AND NEGATIVE BALANCE RELIEF
+Mandatory margin close-out rule requires position liquidation when retail equity falls below 50 percent of initial margin.
+All retail client accounts must be protected against negative balances.

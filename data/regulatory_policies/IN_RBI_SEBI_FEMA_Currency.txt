@@ -1,0 +1,14 @@
+RESERVE BANK OF INDIA (RBI) & SECURITIES AND EXCHANGE BOARD OF INDIA (SEBI)
+Foreign Exchange Management Act, 1999 (FEMA) & Master Direction No. 18
+
+SECTION 1: OVERSEAS LEVERAGED FOREX PROHIBITION
+Resident individuals are prohibited from undertaking margin trading or leveraged foreign exchange contracts on unauthorized overseas online portals under FEMA regulations.
+Remittances under the Liberalised Remittance Scheme (LRS) for margins or margin calls in overseas trading are strictly illegal and punishable under FEMA Section 13.
+
+SECTION 2: DOMESTIC EXCHANGE-TRADED DERIVATIVES
+Permitted exchange-traded currency futures on recognized Indian exchanges require initial margin of 2.5 to 5 percent, permitting leverage up to 1:20.
+Trading is limited to INR-paired currency contracts (USD-INR, EUR-INR, GBP-INR, JPY-INR).
+
+SECTION 3: TRADING & CLEARING MEMBER NET WORTH
+Trading and clearing members in currency derivatives segment must maintain Base Minimum Capital and net worth of at least INR 300,000,000 (INR 30 Crore).
+Brokers must be incorporated in India and maintain registered membership with SEBI and designated domestic clearing corporations.

@@ -1,0 +1,14 @@
+SECURITIES AND FUTURES COMMISSION (SFC) — HONG KONG
+Securities and Futures Ordinance (Cap. 571) — Type 3 Regulated Activity
+
+SECTION 1: LEVERAGED FOREIGN EXCHANGE TRADING (LFET) CAP
+Licensed corporations under Type 3 regulated activity shall observe a maximum leverage ratio of 1:20 (5 percent initial margin) for leveraged foreign exchange contracts.
+No licensee shall permit any retail client to maintain a gross contract position without satisfying the initial margin floor.
+
+SECTION 2: STATUTORY CAPITAL AND LIQUID RESOURCES
+A Type 3 licensed corporation dealing in leveraged foreign exchange must maintain paid-up share capital of not less than HKD 30,000,000.
+Additionally, the corporation must maintain required liquid capital of at least HKD 15,000,000 under the Financial Resources Rules (FRR).
+
+SECTION 3: RESPONSIBLE OFFICER PRESENCE
+Every licensed corporation must have at least two Responsible Officers permanently residing in Hong Kong.
+At least one Responsible Officer must be an Executive Director available in Hong Kong at all times.
