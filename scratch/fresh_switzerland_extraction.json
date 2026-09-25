@@ -1,0 +1,49 @@
+{
+  "validated": [
+    {
+      "jurisdiction": "Switzerland",
+      "regulator": "FINMA",
+      "topic": "capital",
+      "obligation": "minimum capital of CHF 10,000,000",
+      "supporting_quote": "Entities conducting public retail foreign exchange and CFD trading on a commercial basis must obtain a banking license with minimum capital of CHF 10,000,000.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "Switzerland",
+      "regulator": "FINMA",
+      "topic": "leverage",
+      "obligation": "maximum ratio of 1:30 for currency pairs",
+      "supporting_quote": "Internal risk-based margin framework restricts effective retail client leverage to a maximum ratio of 1:30 for currency pairs.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "Switzerland",
+      "regulator": "FINMA",
+      "topic": "capital",
+      "obligation": "strict capital adequacy buffers under the Swiss Capital Adequacy Ordinance (CAO)",
+      "supporting_quote": "Firms must enforce strict capital adequacy buffers under the Swiss Capital Adequacy Ordinance (CAO).",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "Switzerland",
+      "regulator": "FINMA",
+      "topic": "presence",
+      "obligation": "at least one member of executive management and permanent compliance infrastructure must be physically domiciled within Switzerland",
+      "supporting_quote": "At least one member of executive management and permanent compliance infrastructure must be physically domiciled within Switzerland.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    }
+  ],
+  "hallucinations": 0
+}

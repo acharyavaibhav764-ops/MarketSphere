@@ -1,0 +1,38 @@
+{
+  "validated": [
+    {
+      "jurisdiction": "Brazil",
+      "regulator": "CVM & BCB",
+      "topic": "Retail Margin Trading Leverage Limits",
+      "obligation": "Retail customer margin leverage shall not exceed ratio of 1:20 across all registered instruments and currency contracts.",
+      "supporting_quote": "Retail customer margin leverage shall not exceed ratio of 1:20 across all registered instruments and currency contracts.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "Brazil",
+      "regulator": "CVM & BCB",
+      "topic": "Statutory Capital Reserve",
+      "obligation": "Entities operating as virtual asset service providers or derivative dealers must maintain capital reserve of BRL 3,000,000 (USD ~600,000).",
+      "supporting_quote": "Entities operating as virtual asset service providers or derivative dealers must maintain capital reserve of BRL 3,000,000 (USD ~600,000).",
+      "required_capital_usd": 600000,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "Brazil",
+      "regulator": "CVM & BCB",
+      "topic": "Local Entity and Resident Representative",
+      "obligation": "Foreign broker-dealers must establish a registered Brazilian subsidiary (CNPJ) and designate a legally responsible resident representative.",
+      "supporting_quote": "Foreign broker-dealers must establish a registered Brazilian subsidiary (CNPJ) and designate a legally responsible resident representative.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    }
+  ],
+  "hallucinations": 0
+}

@@ -1,0 +1,49 @@
+{
+  "validated": [
+    {
+      "jurisdiction": "UNITED STATES",
+      "regulator": "CFTC",
+      "topic": "capital",
+      "obligation": "Retail foreign exchange dealers (RFEDs) and futures commission merchants (FCMs) must maintain adjusted net capital of not less than $20,000,000.",
+      "supporting_quote": "Retail foreign exchange dealers (RFEDs) and futures commission merchants (FCMs) must maintain adjusted net capital of not less than $20,000,000.",
+      "required_capital_usd": 20000000,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "UNITED STATES",
+      "regulator": "CFTC",
+      "topic": "capital",
+      "obligation": "Entities must maintain this capital floor plus additional reserves equal to 5 percent of all retail customer liabilities exceeding $10,000,000.",
+      "supporting_quote": "Entities must maintain this capital floor plus additional reserves equal to 5 percent of all retail customer liabilities exceeding $10,000,000.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "UNITED STATES",
+      "regulator": "CFTC",
+      "topic": "presence",
+      "obligation": "Registration as a Retail Foreign Exchange Dealer requires maintaining domestic operational office and Chief Compliance Officer in the United States.",
+      "supporting_quote": "Registration as a Retail Foreign Exchange Dealer requires maintaining domestic operational office and Chief Compliance Officer in the United States.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "UNITED STATES",
+      "regulator": "CFTC",
+      "topic": "presence",
+      "obligation": "All books, records, and client account balances must be accessible for direct inspection by NFA and CFTC examiners.",
+      "supporting_quote": "All books, records, and client account balances must be accessible for direct inspection by NFA and CFTC examiners.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    }
+  ],
+  "hallucinations": 2
+}

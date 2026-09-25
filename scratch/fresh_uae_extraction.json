@@ -1,0 +1,27 @@
+{
+  "validated": [
+    {
+      "jurisdiction": "DUBAI",
+      "regulator": "DUBAI VIRTUAL ASSETS REGULATORY AUTHORITY (VARA)",
+      "topic": "leverage",
+      "obligation": "Retail leverage is strictly capped at 1:5 for virtual asset derivatives and margin contracts.",
+      "supporting_quote": "Retail leverage is strictly capped at 1:5 for virtual asset derivatives and margin contracts.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "DUBAI",
+      "regulator": "DUBAI VIRTUAL ASSETS REGULATORY AUTHORITY (VARA)",
+      "topic": "capital",
+      "obligation": "Licensees offering broker-dealer services must maintain paid-up statutory capital of not less than USD 500,000 (AED 1,835,000).",
+      "supporting_quote": "Licensees offering broker-dealer services must maintain paid-up statutory capital of not less than USD 500,000 (AED 1,835,000).",
+      "required_capital_usd": 500000,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    }
+  ],
+  "hallucinations": 1
+}

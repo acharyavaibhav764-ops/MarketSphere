@@ -1,0 +1,38 @@
+{
+  "validated": [
+    {
+      "jurisdiction": "Monetary Authority of Singapore (MAS)",
+      "regulator": "Monetary Authority of Singapore (MAS)",
+      "topic": "leverage",
+      "obligation": "minimum 5 percent",
+      "supporting_quote": "The margin requirement for retail contracts for differences (CFDs) on foreign exchange is minimum 5 percent, restricting maximum retail leverage to 1:20.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": "1:20",
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "Monetary Authority of Singapore (MAS)",
+      "regulator": "Monetary Authority of Singapore (MAS)",
+      "topic": "capital",
+      "obligation": "minimum base capital of SGD 1,000,000",
+      "supporting_quote": "Capital Markets Services (CMS) license holders dealing in capital markets products must maintain minimum base capital of SGD 1,000,000.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "Monetary Authority of Singapore (MAS)",
+      "regulator": "Monetary Authority of Singapore (MAS)",
+      "topic": "presence",
+      "obligation": "local operational management presence in Singapore with at least two executive directors resident in Singapore",
+      "supporting_quote": "Applicant must maintain local operational management presence in Singapore with at least two executive directors resident in Singapore.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    }
+  ],
+  "hallucinations": 0
+}

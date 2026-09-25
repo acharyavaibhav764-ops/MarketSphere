@@ -1,0 +1,71 @@
+{
+  "validated": [
+    {
+      "jurisdiction": "JAPAN",
+      "regulator": "Cabinet Office",
+      "topic": "leverage",
+      "obligation": "Margin trading for retail individual customers on foreign exchange transactions is strictly capped at a leverage ratio of 1:25 (4 percent margin).",
+      "supporting_quote": "Margin trading for retail individual customers on foreign exchange transactions is strictly capped at a leverage ratio of 1:25 (4 percent margin).",
+      "required_capital_usd": null,
+      "leverage_cap_retail": "1:25",
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "JAPAN",
+      "regulator": "Cabinet Office",
+      "topic": "leverage",
+      "obligation": "For cryptocurrency asset margin transactions, retail leverage is capped at 1:2 pursuant to the 2020 Payment Services Act revisions.",
+      "supporting_quote": "For cryptocurrency asset margin transactions, retail leverage is capped at 1:2 pursuant to the 2020 Payment Services Act revisions.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": "1:2",
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "JAPAN",
+      "regulator": "Cabinet Office",
+      "topic": "capital",
+      "obligation": "Type I Financial Instruments Business Operators must maintain minimum net assets of JPY 50,000,000 and capital adequacy ratio of at least 120 percent.",
+      "supporting_quote": "Type I Financial Instruments Business Operators must maintain minimum net assets of JPY 50,000,000 and capital adequacy ratio of at least 120 percent.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "JAPAN",
+      "regulator": "Cabinet Office",
+      "topic": "capital",
+      "obligation": "If the capital adequacy ratio drops below 120 percent, the operator must immediately report to the Director-General of the Local Finance Bureau.",
+      "supporting_quote": "If the capital adequacy ratio drops below 120 percent, the operator must immediately report to the Director-General of the Local Finance Bureau.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "JAPAN",
+      "regulator": "Cabinet Office",
+      "topic": "presence",
+      "obligation": "Brokers must maintain full segregation of customer trust assets with a domestic Japanese trust bank.",
+      "supporting_quote": "Brokers must maintain full segregation of customer trust assets with a domestic Japanese trust bank.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    },
+    {
+      "jurisdiction": "JAPAN",
+      "regulator": "Cabinet Office",
+      "topic": "presence",
+      "obligation": "Co-mingling of broker proprietary funds with customer margin deposits is strictly prohibited.",
+      "supporting_quote": "Co-mingling of broker proprietary funds with customer margin deposits is strictly prohibited.",
+      "required_capital_usd": null,
+      "leverage_cap_retail": null,
+      "presence_friction_summary": null,
+      "evidence_tag": "Verified Fact"
+    }
+  ],
+  "hallucinations": 0
+}
